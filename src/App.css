@@ -1,0 +1,150 @@
+.app-shell {
+  width: min(1000px, 100%);
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.app-header {
+  margin-bottom: 1rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.app-header p {
+  margin: 0.35rem 0 0;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.tab-panel {
+  margin-top: 1rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.question-box,
+.result-box {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  background: #fafafa;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.field label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid #c8c8c8;
+  border-radius: 6px;
+  padding: 0.45rem 0.55rem;
+  background: #fff;
+}
+
+textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+button {
+  border: 1px solid #777;
+  background: #fff;
+  border-radius: 6px;
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status {
+  margin: 0.4rem 0;
+  font-weight: 600;
+}
+
+.status.correct {
+  color: #0f6d2f;
+}
+
+.status.incorrect {
+  color: #8a1c1c;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.compact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.55rem;
+  font-size: 0.92rem;
+}
+
+.compact-table th,
+.compact-table td {
+  border: 1px solid #d7d7d7;
+  padding: 0.4rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.inline-code-block {
+  border: 1px solid #dedede;
+  background: #f8f8f8;
+  border-radius: 6px;
+  padding: 0.6rem;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9rem;
+}
+
+.small-note {
+  margin: 0.35rem 0;
+  font-size: 0.88rem;
+  color: #555;
+}
