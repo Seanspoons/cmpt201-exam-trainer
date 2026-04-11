@@ -14,6 +14,8 @@ export function CodePredictionTab() {
   const [answer, setAnswer] = useState('')
   const [checked, setChecked] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
+  const [attempts, setAttempts] = useState(0)
+  const [correct, setCorrect] = useState(0)
 
   const generateQuestion = () => {
     setQuestion(randomPick(CODE_PREDICTION_QUESTIONS))
@@ -28,7 +30,12 @@ export function CodePredictionTab() {
     const hits = question.acceptedPatterns.filter((pattern) =>
       pattern.test(normalized),
     )
-    setResult({ isCorrect: hits.length >= 2 })
+    const isCorrect = hits.length >= 2
+    setResult({ isCorrect })
+    setAttempts((value) => value + 1)
+    if (isCorrect) {
+      setCorrect((value) => value + 1)
+    }
     setChecked(true)
   }
 
@@ -39,6 +46,9 @@ export function CodePredictionTab() {
         <button onClick={generateQuestion}>Generate Question</button>
         <button onClick={generateQuestion}>Reset / New Question</button>
       </div>
+      <p className="small-note">
+        Session score: {correct}/{attempts}
+      </p>
 
       {question ? (
         <>

@@ -18,6 +18,8 @@ export function AddressTranslationTab() {
   const [physicalAnswer, setPhysicalAnswer] = useState('')
   const [checked, setChecked] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
+  const [attempts, setAttempts] = useState(0)
+  const [correct, setCorrect] = useState(0)
 
   const solution = question ? solveAddressTranslation(question) : null
 
@@ -41,9 +43,12 @@ export function AddressTranslationTab() {
     const offsetCorrect = binaryMatches(offsetAnswer, solution.offsetBinary)
     const physicalCorrect = binaryMatches(physicalAnswer, solution.physicalBinary)
 
-    setResult({
-      isCorrect: pageCorrect && offsetCorrect && physicalCorrect,
-    })
+    const isCorrect = pageCorrect && offsetCorrect && physicalCorrect
+    setResult({ isCorrect })
+    setAttempts((value) => value + 1)
+    if (isCorrect) {
+      setCorrect((value) => value + 1)
+    }
     setChecked(true)
   }
 
@@ -54,6 +59,9 @@ export function AddressTranslationTab() {
         <button onClick={generateQuestion}>Generate Question</button>
         <button onClick={generateQuestion}>Reset / New Question</button>
       </div>
+      <p className="small-note">
+        Session score: {correct}/{attempts}
+      </p>
 
       {question && solution ? (
         <>

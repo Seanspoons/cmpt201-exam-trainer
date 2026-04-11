@@ -15,6 +15,8 @@ export function ConcurrencyDebugTab() {
   const [textAnswer, setTextAnswer] = useState('')
   const [checked, setChecked] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
+  const [attempts, setAttempts] = useState(0)
+  const [correct, setCorrect] = useState(0)
 
   const generateQuestion = () => {
     setQuestion(randomPick(CONCURRENCY_QUESTIONS))
@@ -29,7 +31,12 @@ export function ConcurrencyDebugTab() {
 
     if (question.type === 'mcq') {
       if (mcqAnswer === null) return
-      setResult({ isCorrect: mcqAnswer === question.correctOption })
+      const isCorrect = mcqAnswer === question.correctOption
+      setResult({ isCorrect })
+      setAttempts((value) => value + 1)
+      if (isCorrect) {
+        setCorrect((value) => value + 1)
+      }
       setChecked(true)
       return
     }
@@ -38,7 +45,12 @@ export function ConcurrencyDebugTab() {
     const matches = question.acceptedPatterns.filter((pattern) =>
       pattern.test(normalized),
     )
-    setResult({ isCorrect: matches.length >= 2 })
+    const isCorrect = matches.length >= 2
+    setResult({ isCorrect })
+    setAttempts((value) => value + 1)
+    if (isCorrect) {
+      setCorrect((value) => value + 1)
+    }
     setChecked(true)
   }
 
@@ -49,6 +61,9 @@ export function ConcurrencyDebugTab() {
         <button onClick={generateQuestion}>Generate Question</button>
         <button onClick={generateQuestion}>Reset / New Question</button>
       </div>
+      <p className="small-note">
+        Session score: {correct}/{attempts}
+      </p>
 
       {question ? (
         <>
