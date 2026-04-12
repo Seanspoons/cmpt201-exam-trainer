@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
+import { useConfirmDialog } from '../../components/ConfirmDialogContext'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
 import { useSessionContext } from '../../components/SessionContext'
 import { useTopicContext } from '../../components/TopicContext'
@@ -34,6 +35,7 @@ export function SchedulingConceptPractice({
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
   const { recordAttempt, overrideAttemptResult } = useSessionContext()
+  const { requestConfirm } = useConfirmDialog()
   const { unitLabel, subtopicLabel } = useTopicContext()
   const { hasNextSubtopic, goToNextSubtopic } = useUnitNavigationContext()
   const seenQuestionIdsRef = useRef<Set<string>>(new Set())
@@ -46,41 +48,47 @@ export function SchedulingConceptPractice({
     setResult(null)
   }
 
-  const generate = () => {
+  const generate = async () => {
+    if (transition.isTransitioning) return
+
+    const selectQuestion = () => {
+      let fallback = generateQuestion()
+      for (let i = 0; i < 24; i += 1) {
+        const candidate = generateQuestion()
+        fallback = candidate
+        const unseen = !seenQuestionIdsRef.current.has(candidate.id)
+        const notSameAsLast = candidate.id !== lastQuestionIdRef.current
+        if (unseen && notSameAsLast) {
+          return { question: candidate, exhausted: false }
+        }
+      }
+      return { question: fallback, exhausted: true }
+    }
+
+    let { question: rawQuestion, exhausted } = selectQuestion()
+    if (exhausted) {
+      const wantsNext = hasNextSubtopic
+        ? await requestConfirm({
+            title: 'Topic Completed',
+            message:
+              'You have seen all questions in this topic. Move to the next topic?',
+            confirmLabel: 'Move to Next Topic',
+            cancelLabel: 'Stay Here',
+          })
+        : false
+      if (wantsNext) {
+        goToNextSubtopic()
+        return
+      }
+      seenQuestionIdsRef.current.clear()
+      const retry = selectQuestion()
+      rawQuestion = retry.question
+    }
+
+    seenQuestionIdsRef.current.add(rawQuestion.id)
+    lastQuestionIdRef.current = rawQuestion.id
+
     transition.runQuestionTransition(() => {
-      const selectQuestion = () => {
-        let fallback = generateQuestion()
-        for (let i = 0; i < 24; i += 1) {
-          const candidate = generateQuestion()
-          fallback = candidate
-          const unseen = !seenQuestionIdsRef.current.has(candidate.id)
-          const notSameAsLast = candidate.id !== lastQuestionIdRef.current
-          if (unseen && notSameAsLast) {
-            return { question: candidate, exhausted: false }
-          }
-        }
-        return { question: fallback, exhausted: true }
-      }
-
-      let { question: rawQuestion, exhausted } = selectQuestion()
-      if (exhausted) {
-        const wantsNext =
-          hasNextSubtopic &&
-          window.confirm(
-            'You have seen all questions in this topic. Move to the next topic?',
-          )
-        if (wantsNext) {
-          goToNextSubtopic()
-          return
-        }
-        seenQuestionIdsRef.current.clear()
-        const retry = selectQuestion()
-        rawQuestion = retry.question
-      }
-
-      seenQuestionIdsRef.current.add(rawQuestion.id)
-      lastQuestionIdRef.current = rawQuestion.id
-
       if (rawQuestion.type === 'mcq') {
         const shuffled = shuffleChoicesWithCorrectIndex(
           rawQuestion.options,
