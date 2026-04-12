@@ -80,22 +80,17 @@ const STD_FD_AND_DEVICE_QUESTIONS: NetworkingQuestion[] = [
 const PARTITIONS_AND_TREES_QUESTIONS: NetworkingQuestion[] = [
   {
     id: 'fs-partition-tree-view',
-    kind: 'text',
+    kind: 'mcq',
     prompt:
-      'How do partitions/filesystems relate to what users see in the path tree?',
-    requiredConcepts: [
-      { label: 'Partitions hold filesystems', keywords: ['partition', 'filesystem on partition'] },
-      { label: 'Single tree rooted at /', keywords: ['single tree', 'rooted at /', 'one directory tree'] },
-      { label: 'Mount combines them', keywords: ['mount', 'mounted', 'attach'] },
-    ],
-    answerDisplay:
-      'Partitions typically hold filesystems, and mounting merges them into one apparent tree rooted at /.',
+      'True or False: Users normally interact with separate root trees per partition, not one unified tree.',
+    options: ['True', 'False'],
+    correctOption: 1,
     explanationSteps: [
-      'Storage is often split into partitions.',
-      'A partition commonly contains one filesystem.',
-      'Mounting attaches filesystems into directories so users see one tree rooted at /.',
+      'Users usually see one apparent tree rooted at /.',
+      'Partitions/filesystems are joined into that namespace through mount points.',
+      'The partition layout is underlying structure, not separate visible roots.',
     ],
-    conceptSummary: 'Underlying partitions differ from the unified mounted namespace users browse.',
+    conceptSummary: 'Mounting merges filesystems from partitions into one user-facing tree rooted at /.',
   },
 ]
 
