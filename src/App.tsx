@@ -77,7 +77,7 @@ function App() {
     <main className="app-shell">
       <header className="app-header">
         <h1>CMPT 201 Exam Trainer</h1>
-        <p>Exam-style drills for CMPT 201 post-midterm units</p>
+        <p>Exam-style drills for CMPT 201 pre-midterm and post-midterm units</p>
       </header>
       <TabNav
         options={UNIT_OPTIONS}

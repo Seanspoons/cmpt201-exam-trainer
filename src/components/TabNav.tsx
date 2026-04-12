@@ -21,7 +21,7 @@ export function TabNav<T extends string>({
       aria-label="Study topics"
       className={`tab-nav tab-nav--${variant}`}
     >
-      <div className="controls-row" role="tablist">
+      <div className="controls-row tab-row" role="tablist">
         {options.map((option) => (
           <button
             key={option.id}
