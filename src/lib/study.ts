@@ -62,6 +62,6 @@ export const UNIT_OPTIONS: UnitOption[] = [
   },
   { id: 'ipc-pipes', label: 'IPC: Pipes', implemented: true, questionCount: 14 },
   { id: 'ipc-shared-memory', label: 'IPC: Shared Memory', implemented: true, questionCount: 14 },
-  { id: 'crypto-algorithms', label: 'Cryptography: Algorithms', implemented: false },
-  { id: 'crypto-applications', label: 'Cryptography: Applications', implemented: false },
+  { id: 'crypto-algorithms', label: 'Cryptography: Algorithms', implemented: true, questionCount: 14 },
+  { id: 'crypto-applications', label: 'Cryptography: Applications', implemented: true, questionCount: 16 },
 ]
