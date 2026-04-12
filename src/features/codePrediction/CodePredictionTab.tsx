@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { randomPick } from '../../lib/random'
 import {
-  CODE_PREDICTION_QUESTIONS,
+  generateCodePredictionQuestion,
   isPredictionAnswerCorrect,
   type CodePredictionQuestion,
 } from './questions'
@@ -19,7 +18,7 @@ export function CodePredictionTab() {
   const [correct, setCorrect] = useState(0)
 
   const generateQuestion = () => {
-    setQuestion(randomPick(CODE_PREDICTION_QUESTIONS))
+    setQuestion(generateCodePredictionQuestion())
     setAnswer('')
     setChecked(false)
     setResult(null)
@@ -55,7 +54,7 @@ export function CodePredictionTab() {
           </div>
           <div className="field">
             <label htmlFor="codeAnswer">Your answer</label>
-            <textarea
+            <input
               id="codeAnswer"
               value={answer}
               onChange={(event) => setAnswer(event.target.value)}
@@ -73,9 +72,15 @@ export function CodePredictionTab() {
                 {result.isCorrect ? 'Correct' : 'Incorrect'}
               </p>
               <p>
-                Expected answer(s):{' '}
-                <strong>{question.correctAnswers.join(' OR ')}</strong>
+                Accepted answer(s):
               </p>
+              <ul>
+                {question.correctAnswers.map((value) => (
+                  <li key={value}>
+                    <strong>{value}</strong>
+                  </li>
+                ))}
+              </ul>
               <table className="compact-table">
                 <thead>
                   <tr>

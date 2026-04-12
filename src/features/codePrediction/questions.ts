@@ -1,3 +1,5 @@
+import { randomPick } from '../../lib/random'
+
 export type CodePredictionQuestion = {
   id: string
   prompt: string
@@ -22,7 +24,7 @@ export function isPredictionAnswerCorrect(
     .includes(actual)
 }
 
-export const CODE_PREDICTION_QUESTIONS: CodePredictionQuestion[] = [
+const FORK_QUESTIONS: CodePredictionQuestion[] = [
   {
     id: 'fork-print-count',
     prompt: 'How many times does "X" print?',
@@ -60,6 +62,28 @@ printf("X\\n");`,
     concepts: ['fork return values differ in parent/child', 'scheduler affects print order'],
     nonDeterministicNote: 'Relative order of parent/child lines is non-deterministic.',
   },
+]
+
+const EXEC_QUESTIONS: CodePredictionQuestion[] = [
+  {
+    id: 'exec-replace',
+    prompt: 'What output behavior is correct for this snippet?',
+    code: `printf("A\\n");
+execlp("ls", "ls", NULL);
+printf("B\\n");`,
+    correctAnswers: [
+      'B does not print if exec succeeds',
+      'code after successful exec does not run',
+      'exec replaces the process image so B is not printed',
+    ],
+    explanationSteps: [
+      'Step 1: Process prints A.',
+      'Step 2: execlp succeeds and replaces the current process image.',
+      'Step 3: Control does not return to the next line in this program.',
+      'Step 4: B prints only if exec fails.',
+    ],
+    concepts: ['exec replaces current process', 'code after successful exec is not executed'],
+  },
   {
     id: 'fork-exec-child',
     prompt: 'What definitely prints from this program?',
@@ -83,25 +107,9 @@ printf("Done\\n");`,
     nonDeterministicNote:
       '"Hi" and "Done" ordering can vary unless synchronized with wait().',
   },
-  {
-    id: 'exec-replace',
-    prompt: 'What output behavior is correct for this snippet?',
-    code: `printf("A\\n");
-execlp("ls", "ls", NULL);
-printf("B\\n");`,
-    correctAnswers: [
-      'B does not print if exec succeeds',
-      'code after successful exec does not run',
-      'exec replaces the process image so B is not printed',
-    ],
-    explanationSteps: [
-      'Step 1: Process prints A.',
-      'Step 2: execlp succeeds and replaces the current process image.',
-      'Step 3: Control does not return to the next line in this program.',
-      'Step 4: B prints only if exec fails.',
-    ],
-    concepts: ['exec replaces current process', 'code after successful exec is not executed'],
-  },
+]
+
+const PIPE_QUESTIONS: CodePredictionQuestion[] = [
   {
     id: 'pipe-write-read',
     prompt: 'What does the parent print?',
@@ -168,6 +176,9 @@ printf("%s\\n", buf);`,
     ],
     concepts: ['read vs C-string conventions', 'memory safety in output'],
   },
+]
+
+const FILE_IO_QUESTIONS: CodePredictionQuestion[] = [
   {
     id: 'stdio-buffering',
     prompt: 'Immediately after fprintf and before fclose, what may be true?',
@@ -188,3 +199,36 @@ sleep(10);`,
     concepts: ['stdio buffering behavior', 'flush semantics vs immediate write'],
   },
 ]
+
+export const CODE_PREDICTION_QUESTIONS: CodePredictionQuestion[] = [
+  ...FORK_QUESTIONS,
+  ...EXEC_QUESTIONS,
+  ...PIPE_QUESTIONS,
+  ...FILE_IO_QUESTIONS,
+]
+
+export function generateForkQuestion(): CodePredictionQuestion {
+  return randomPick(FORK_QUESTIONS)
+}
+
+export function generateExecQuestion(): CodePredictionQuestion {
+  return randomPick(EXEC_QUESTIONS)
+}
+
+export function generatePipeQuestion(): CodePredictionQuestion {
+  return randomPick(PIPE_QUESTIONS)
+}
+
+export function generateFileIoQuestion(): CodePredictionQuestion {
+  return randomPick(FILE_IO_QUESTIONS)
+}
+
+export function generateCodePredictionQuestion(): CodePredictionQuestion {
+  const generators = [
+    generateForkQuestion,
+    generateExecQuestion,
+    generatePipeQuestion,
+    generateFileIoQuestion,
+  ]
+  return randomPick(generators)()
+}
