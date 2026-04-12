@@ -6,17 +6,8 @@ import { NetworkingUnit } from './features/networking/NetworkingUnit'
 import { ProcessesUnit } from './features/processes/ProcessesUnit'
 import { SynchronizationUnit } from './features/synchronization/SynchronizationUnit'
 import { VirtualMemoryUnit } from './features/virtualMemory/VirtualMemoryUnit'
-import type { UnitId } from './lib/study'
+import { UNIT_OPTIONS, type UnitId } from './lib/study'
 import './App.css'
-
-const UNIT_OPTIONS: Array<{ id: UnitId; label: string }> = [
-  { id: 'processes', label: 'Processes' },
-  { id: 'virtual-memory', label: 'Virtual Memory' },
-  { id: 'synchronization', label: 'Synchronization' },
-  { id: 'file-io-ipc', label: 'File I/O and IPC' },
-  { id: 'networking', label: 'Networking' },
-  { id: 'cryptography', label: 'Cryptography' },
-]
 
 function App() {
   const [activeUnit, setActiveUnit] = useState<UnitId>('virtual-memory')

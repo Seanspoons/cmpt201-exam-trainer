@@ -6,11 +6,10 @@ type PlaceholderPanelProps = {
 export function PlaceholderPanel({ unitLabel, subtopicLabel }: PlaceholderPanelProps) {
   return (
     <div>
-      <h2 className="section-title">{unitLabel}</h2>
+      <h3 className="section-title">
+        {unitLabel} {'>'} {subtopicLabel}
+      </h3>
       <div className="question-box">
-        <p>
-          <strong>{subtopicLabel}</strong>
-        </p>
         <p>This subtopic is scaffolded and ready for question templates.</p>
       </div>
     </div>
