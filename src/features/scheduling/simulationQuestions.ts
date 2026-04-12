@@ -1,4 +1,5 @@
 import { randomInt, randomPick } from '../../lib/random'
+import { shuffleChoicesWithCorrectIndex } from '../../lib/questionRandomize'
 import {
   simulateFcfs,
   simulatePriority,
@@ -59,10 +60,7 @@ function buildTimelineChoices(correct: string): { choices: string[]; correctInde
       : parts.join(' | ')
 
   const choices = [correct, reverse, shifted]
-  return {
-    choices,
-    correctIndex: 0,
-  }
+  return shuffleChoicesWithCorrectIndex(choices, 0)
 }
 
 function createQuestionFromSimulation(
