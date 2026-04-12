@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import {
   formatFrames,
+  formatReferenceBits,
   generatePageReplacementQuestion,
   solvePageReplacement,
+  type PageReplacementAlgorithm,
   type PageReplacementQuestion,
 } from './engine'
 
@@ -28,8 +30,15 @@ function parseFrameAnswer(raw: string): number[] | null {
   return values
 }
 
+function formatVictimPointer(pointer: number | undefined): string {
+  if (pointer === undefined) return '-'
+  return `F${pointer + 1}`
+}
+
 export function PageReplacementTab() {
   const [question, setQuestion] = useState<PageReplacementQuestion | null>(null)
+  const [selectedAlgorithm, setSelectedAlgorithm] =
+    useState<PageReplacementAlgorithm>('FIFO')
   const [faultAnswer, setFaultAnswer] = useState('')
   const [frameAnswer, setFrameAnswer] = useState('')
   const [checked, setChecked] = useState(false)
@@ -40,7 +49,7 @@ export function PageReplacementTab() {
   const solution = question ? solvePageReplacement(question) : null
 
   const generateQuestion = () => {
-    setQuestion(generatePageReplacementQuestion())
+    setQuestion(generatePageReplacementQuestion(selectedAlgorithm))
     setFaultAnswer('')
     setFrameAnswer('')
     setChecked(false)
@@ -93,6 +102,19 @@ export function PageReplacementTab() {
     <div>
       <h2 className="section-title">Page Replacement</h2>
       <div className="controls-row">
+        <label className="field" style={{ minWidth: 180, marginBottom: 0 }}>
+          <span>Algorithm</span>
+          <select
+            value={selectedAlgorithm}
+            onChange={(event) =>
+              setSelectedAlgorithm(event.target.value as PageReplacementAlgorithm)
+            }
+          >
+            <option value="FIFO">FIFO</option>
+            <option value="LRU">LRU</option>
+            <option value="Second Chance">Second Chance</option>
+          </select>
+        </label>
         <button onClick={generateQuestion}>Generate Question</button>
         <button onClick={generateQuestion}>Reset / New Question</button>
       </div>
@@ -158,6 +180,8 @@ export function PageReplacementTab() {
                     <th>Step</th>
                     <th>Page</th>
                     <th>Frames</th>
+                    <th>Ref Bits</th>
+                    <th>Victim Ptr</th>
                     <th>Fault?</th>
                     <th>Evicted</th>
                     <th>Reason</th>
@@ -169,6 +193,10 @@ export function PageReplacementTab() {
                       <td>{step.step}</td>
                       <td>{step.page}</td>
                       <td className="mono">{formatFrames(step.frames)}</td>
+                      <td className="mono">{formatReferenceBits(step.referenceBits)}</td>
+                      <td className="mono">
+                        {formatVictimPointer(step.victimPointer)}
+                      </td>
                       <td>{step.pageFault ? 'Yes' : 'No'}</td>
                       <td>{step.evictedPage ?? '-'}</td>
                       <td>{step.reason}</td>

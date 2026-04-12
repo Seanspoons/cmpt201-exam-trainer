@@ -1,6 +1,6 @@
 import { randomInt, randomPick } from '../../lib/random'
 
-export type PageReplacementAlgorithm = 'FIFO' | 'LRU'
+export type PageReplacementAlgorithm = 'FIFO' | 'LRU' | 'Second Chance'
 
 export type PageReplacementQuestion = {
   algorithm: PageReplacementAlgorithm
@@ -12,6 +12,8 @@ export type PageReplacementStep = {
   step: number
   page: number
   frames: Array<number | null>
+  referenceBits?: number[]
+  victimPointer?: number
   pageFault: boolean
   evictedPage: number | null
   reason: string
@@ -23,14 +25,16 @@ export type PageReplacementSolution = {
   finalFrames: Array<number | null>
 }
 
-export function generatePageReplacementQuestion(): PageReplacementQuestion {
+export function generatePageReplacementQuestion(
+  algorithm?: PageReplacementAlgorithm,
+): PageReplacementQuestion {
   const frameCount = randomPick([3, 4])
   const length = randomInt(6, 10)
   const maxPage = randomPick([5, 7])
   const referenceString = Array.from({ length }, () => randomInt(1, maxPage))
 
   return {
-    algorithm: randomPick(['FIFO', 'LRU']),
+    algorithm: algorithm ?? randomPick(['FIFO', 'LRU', 'Second Chance']),
     frameCount,
     referenceString,
   }
@@ -39,7 +43,16 @@ export function generatePageReplacementQuestion(): PageReplacementQuestion {
 export function solvePageReplacement(
   question: PageReplacementQuestion,
 ): PageReplacementSolution {
-  return question.algorithm === 'FIFO' ? solveFifo(question) : solveLru(question)
+  switch (question.algorithm) {
+    case 'FIFO':
+      return solveFifo(question)
+    case 'LRU':
+      return solveLru(question)
+    case 'Second Chance':
+      return solveSecondChance(question)
+    default:
+      return solveFifo(question)
+  }
 }
 
 function solveFifo(question: PageReplacementQuestion): PageReplacementSolution {
@@ -176,6 +189,92 @@ function solveLru(question: PageReplacementQuestion): PageReplacementSolution {
   }
 }
 
+function solveSecondChance(
+  question: PageReplacementQuestion,
+): PageReplacementSolution {
+  const frameCount = question.frameCount
+  const frames: Array<number | null> = Array.from({ length: frameCount }, () => null)
+  const referenceBits: number[] = Array.from({ length: frameCount }, () => 0)
+  let victimPointer = 0
+  let totalFaults = 0
+  const steps: PageReplacementStep[] = []
+
+  question.referenceString.forEach((page, index) => {
+    const step = index + 1
+    const hitIndex = frames.indexOf(page)
+
+    if (hitIndex >= 0) {
+      referenceBits[hitIndex] = 1
+      steps.push({
+        step,
+        page,
+        frames: [...frames],
+        referenceBits: [...referenceBits],
+        victimPointer,
+        pageFault: false,
+        evictedPage: null,
+        reason: `Hit: page ${page} already in frame ${hitIndex + 1}, set its reference bit to 1.`,
+      })
+      return
+    }
+
+    totalFaults += 1
+    let evictedPage: number | null = null
+    const scans: string[] = []
+
+    while (true) {
+      if (frames[victimPointer] === null) {
+        frames[victimPointer] = page
+        referenceBits[victimPointer] = 1
+        scans.push(
+          `Fault: frame ${victimPointer + 1} was empty, inserted page ${page}.`,
+        )
+        victimPointer = (victimPointer + 1) % frameCount
+        break
+      }
+
+      if (referenceBits[victimPointer] === 0) {
+        evictedPage = frames[victimPointer]
+        frames[victimPointer] = page
+        referenceBits[victimPointer] = 1
+        scans.push(
+          `Fault: evicted page ${evictedPage} from frame ${victimPointer + 1} because reference bit was 0.`,
+        )
+        victimPointer = (victimPointer + 1) % frameCount
+        break
+      }
+
+      referenceBits[victimPointer] = 0
+      scans.push(
+        `Fault: frame ${victimPointer + 1} had reference bit 1, cleared it and advanced pointer.`,
+      )
+      victimPointer = (victimPointer + 1) % frameCount
+    }
+
+    steps.push({
+      step,
+      page,
+      frames: [...frames],
+      referenceBits: [...referenceBits],
+      victimPointer,
+      pageFault: true,
+      evictedPage,
+      reason: scans.join(' '),
+    })
+  })
+
+  return {
+    steps,
+    totalFaults,
+    finalFrames: [...frames],
+  }
+}
+
 export function formatFrames(frames: Array<number | null>): string {
   return `[${frames.map((value) => (value === null ? '-' : value)).join(', ')}]`
+}
+
+export function formatReferenceBits(bits?: number[]): string {
+  if (!bits) return '-'
+  return `[${bits.join(', ')}]`
 }
