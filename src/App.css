@@ -524,8 +524,12 @@
   font-size: 0.86rem;
   color: var(--muted);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.35rem;
+}
+
+.answer-feedback-concept svg {
+  flex-shrink: 0;
 }
 
 .placeholder-card {
