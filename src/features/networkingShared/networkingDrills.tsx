@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
+import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useQuestionTransition } from '../../components/useQuestionTransition'
+import { useResetPulse } from '../../components/useResetPulse'
 import type { ConceptGroup } from '../../lib/semanticGrading'
 import { gradeByConceptGroups } from '../../lib/semanticGrading'
 
@@ -63,14 +66,28 @@ export function NetworkingDrillPractice({
   const [result, setResult] = useState<CheckResult | null>(null)
   const [attempts, setAttempts] = useState(0)
   const [correct, setCorrect] = useState(0)
+  const transition = useQuestionTransition()
+  const resetPulse = useResetPulse()
 
-  const generate = () => {
-    setQuestion(generateQuestion())
+  const resetAnswerInputs = () => {
     setMcqAnswer(null)
     setTextAnswer('')
     setMatchAnswer({})
     setChecked(false)
     setResult(null)
+  }
+
+  const generate = () => {
+    transition.runQuestionTransition(() => {
+      setQuestion(generateQuestion())
+      resetAnswerInputs()
+    })
+  }
+
+  const resetAnswerOnly = () => {
+    if (!question) return
+    resetAnswerInputs()
+    resetPulse.triggerResetPulse()
   }
 
   const checkAnswer = () => {
@@ -246,18 +263,26 @@ export function NetworkingDrillPractice({
   return (
     <div>
       <h3 className="section-title">{title}</h3>
-      <div className="controls-row">
-        <button className="button-secondary" onClick={generate}>
-          Generate Question
-        </button>
-        <button className="button-secondary" onClick={generate}>
-          Reset / New Question
-        </button>
-      </div>
+      <QuestionControlBar
+        hasQuestion={Boolean(question)}
+        isTransitioning={transition.isTransitioning}
+        onNewQuestion={generate}
+        onResetAnswer={resetAnswerOnly}
+        disableReset={!question}
+      />
       <p className="small-note">
         Session score: {correct}/{attempts}
       </p>
 
+      <div
+        className={`question-stage ${
+          transition.phase === 'out'
+            ? 'question-stage--out'
+            : transition.phase === 'in'
+              ? 'question-stage--in'
+              : ''
+        }`}
+      >
       {question ? (
         <>
           <div className="question-box">
@@ -267,7 +292,13 @@ export function NetworkingDrillPractice({
             ) : null}
           </div>
 
-          {renderAnswerInput()}
+          <div
+            className={`answer-input-region ${
+              resetPulse.isResetActive ? 'answer-input-region--reset' : ''
+            }`}
+          >
+            {renderAnswerInput()}
+          </div>
 
           <div style={{ marginTop: '0.65rem' }}>
             <button
@@ -333,6 +364,7 @@ export function NetworkingDrillPractice({
       ) : (
         <p>Generate a question to start.</p>
       )}
+      </div>
     </div>
   )
 }
