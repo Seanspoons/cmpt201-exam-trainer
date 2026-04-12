@@ -3,6 +3,23 @@ import type { NetworkingQuestion } from '../networkingShared/networkingDrills'
 
 const WAIT_BASICS_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'waiterrno-fill-blank-waitpid-status',
+    kind: 'text',
+    prompt: 'Fill in the blank so waitpid can store child status.',
+    code: `int wstatus;
+waitpid(pid, _____, 0);`,
+    requiredConcepts: [
+      { label: '&wstatus', keywords: ['&wstatus', 'wstatus address', '& wstatus'] },
+    ],
+    answerDisplay: '`&wstatus`',
+    explanationSteps: [
+      'waitpid expects pointer for output status storage.',
+      'Passing value instead of address prevents write-back.',
+      'This is a classic output-parameter pattern.',
+    ],
+    conceptSummary: 'Code-completion: waitpid status argument should be an address.',
+  },
+  {
     id: 'waiterrno-why-wait',
     kind: 'mcq',
     prompt: 'Why should a parent call wait()/waitpid() after creating children?',
@@ -39,6 +56,24 @@ const WAIT_BASICS_QUESTIONS: NetworkingQuestion[] = [
 ]
 
 const WSTATUS_OUTPUT_QUESTIONS: NetworkingQuestion[] = [
+  {
+    id: 'waiterrno-complete-status-check',
+    kind: 'text',
+    prompt: 'Complete this normal-exit check with the correct macro.',
+    code: `if (_____(wstatus)) {
+  printf("exit=%d\\n", WEXITSTATUS(wstatus));
+}`,
+    requiredConcepts: [
+      { label: 'WIFEXITED', keywords: ['wifexited', 'WIFEXITED'] },
+    ],
+    answerDisplay: '`WIFEXITED`',
+    explanationSteps: [
+      'Status must be decoded via guard macro first.',
+      'WEXITSTATUS is valid only when WIFEXITED is true.',
+      'Using extraction macro without guard can be incorrect.',
+    ],
+    conceptSummary: 'Use WIFEXITED before reading WEXITSTATUS.',
+  },
   {
     id: 'waiterrno-why-address-wstatus',
     kind: 'text',
@@ -156,6 +191,29 @@ sleep(30); // parent never calls wait`,
     ],
     conceptSummary: 'Missing wait after child exit is common zombie bug.',
   },
+  {
+    id: 'waiterrno-bug-ignoring-wait',
+    kind: 'mcq',
+    prompt: 'What is the main bug in this parent path?',
+    code: `pid_t pid = fork();
+if (pid > 0) {
+  // parent does other work forever
+  while (1) { /* work */ }
+}`,
+    options: [
+      'Parent never waits/reaps child, so terminated child can become zombie',
+      'fork always blocks parent until child exits',
+      'Child automatically reaps parent, so no issue',
+      'This creates only orphans, never zombies',
+    ],
+    correctOption: 0,
+    explanationSteps: [
+      'If child exits and parent never waits, zombie entry can persist.',
+      'Long-running parent can accumulate zombie children over time.',
+      'Fix: wait/waitpid (or SIGCHLD handling) in parent lifecycle.',
+    ],
+    conceptSummary: 'Bug-fix pattern: parent must reap children.',
+  },
 ]
 
 const ERRNO_PERROR_QUESTIONS: NetworkingQuestion[] = [
@@ -240,4 +298,4 @@ export function generateErrnoQuestion(): NetworkingQuestion {
   return randomPick(ERRNO_PERROR_QUESTIONS)
 }
 
-export const WAIT_ERRNO_QUESTION_COUNT = 12
+export const WAIT_ERRNO_QUESTION_COUNT = 15

@@ -3,6 +3,22 @@ import type { NetworkingQuestion } from '../networkingShared/networkingDrills'
 
 const FORK_BASICS_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'forkexec-fill-blank-fork-call',
+    kind: 'text',
+    prompt: 'Fill in the blank with the correct process-creation call.',
+    code: `pid_t pid = _____();`,
+    requiredConcepts: [
+      { label: 'fork()', keywords: ['fork', 'fork()'] },
+    ],
+    answerDisplay: '`fork()`',
+    explanationSteps: [
+      'fork() creates a child process by cloning current process context.',
+      'Return value differs in parent/child and should be checked.',
+      'This is the standard process-creation call in this unit.',
+    ],
+    conceptSummary: 'Fill-blank core API recall: process creation uses fork().',
+  },
+  {
     id: 'forkexec-fork-return-values',
     kind: 'text',
     prompt: 'What does fork() return in the parent, child, and on failure?',
@@ -188,6 +204,25 @@ if (rc == 0) {
 
 const EXEC_BASICS_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'forkexec-fill-blank-exec-call',
+    kind: 'text',
+    prompt: 'Complete the child branch with an exec-family call.',
+    code: `if (pid == 0) {
+  _____("/bin/echo", "echo", "Hi", NULL);
+  perror("exec failed");
+}`,
+    requiredConcepts: [
+      { label: 'execl()', keywords: ['execl', 'execl()'] },
+    ],
+    answerDisplay: '`execl` (any valid exec-family call is conceptually acceptable)',
+    explanationSteps: [
+      'Child commonly calls an exec-family function after fork.',
+      'exec success replaces process image and does not return.',
+      'perror line is failure-path handling if exec returns.',
+    ],
+    conceptSummary: 'Fork+exec pattern uses exec-family call in child branch.',
+  },
+  {
     id: 'forkexec-what-exec-does',
     kind: 'text',
     prompt: 'What does exec() do to the calling process?',
@@ -266,6 +301,29 @@ const EXEC_FLAVORS_QUESTIONS: NetworkingQuestion[] = [
 
 const FORK_EXEC_COMBINED_FLOW_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'forkexec-bug-missing-exit-after-exec-fail',
+    kind: 'mcq',
+    prompt: 'Identify the bug risk in this child path.',
+    code: `if (pid == 0) {
+  execl("/bin/ls", "ls", NULL);
+  perror("exec failed");
+  // missing line
+}`,
+    options: [
+      'Child should exit after exec failure to avoid falling through parent-oriented logic',
+      'perror must be removed because exec never fails',
+      'execl must always be called in parent branch only',
+      'No issue; child should continue exactly like parent',
+    ],
+    correctOption: 0,
+    explanationSteps: [
+      'If exec fails, child returns to same program image.',
+      'Without explicit exit/error return, child may run unintended code paths.',
+      'Typical pattern: report error then `_exit(1)` in child.',
+    ],
+    conceptSummary: 'Common bug: missing child termination on exec failure path.',
+  },
+  {
     id: 'forkexec-combined-pattern',
     kind: 'mcq',
     prompt: 'In the common pattern `fork(); if(child) exec(...); else parent continues;`, what is true?',
@@ -338,4 +396,4 @@ export function generateForkExecCombinedQuestion(): NetworkingQuestion {
   return randomPick(FORK_EXEC_COMBINED_FLOW_QUESTIONS)
 }
 
-export const FORK_EXEC_QUESTION_COUNT = 16
+export const FORK_EXEC_QUESTION_COUNT = 19

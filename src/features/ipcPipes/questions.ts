@@ -3,6 +3,23 @@ import type { NetworkingQuestion } from '../networkingShared/networkingDrills'
 
 const ANONYMOUS_PIPE_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'pipes-fill-blank-pipe-call',
+    kind: 'text',
+    prompt: 'Fill in the blank with the correct system call.',
+    code: `int fd[2];
+_____(fd);`,
+    requiredConcepts: [
+      { label: 'pipe()', keywords: ['pipe', 'pipe()'] },
+    ],
+    answerDisplay: '`pipe()`',
+    explanationSteps: [
+      'pipe creates connected read/write file descriptors.',
+      'fd[0] becomes read end and fd[1] write end.',
+      'This is the standard anonymous pipe setup call.',
+    ],
+    conceptSummary: 'Code-completion recall: anonymous pipe setup uses pipe().',
+  },
+  {
     id: 'pipes-fd-ends',
     kind: 'mcq',
     prompt: 'After `pipe(filedes)`, which end is read and which is write?',
@@ -156,6 +173,23 @@ const CLOSING_ENDS_QUESTIONS: NetworkingQuestion[] = [
 
 const DUP2_REDIR_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'pipes-fill-blank-dup2-stdout',
+    kind: 'text',
+    prompt: 'Complete this stdout redirection setup for a pipe writer process.',
+    code: `// want stdout to go to pipe write end
+_____(filedes[1], STDOUT_FILENO);`,
+    requiredConcepts: [
+      { label: 'dup2()', keywords: ['dup2', 'dup2()'] },
+    ],
+    answerDisplay: '`dup2`',
+    explanationSteps: [
+      'dup2 remaps STDOUT to target FD.',
+      'After remap, printf/write to stdout flows into pipe.',
+      'Commonly used before exec in pipelines.',
+    ],
+    conceptSummary: 'Pipe code completion: use dup2 for descriptor redirection.',
+  },
+  {
     id: 'pipes-dup2-stdout',
     kind: 'mcq',
     prompt: 'What does `dup2(filedes[1], STDOUT_FILENO)` do?',
@@ -298,5 +332,4 @@ export function generateMqContrastQuestion(): NetworkingQuestion {
   return randomPick(MQ_CONTRAST_QUESTIONS)
 }
 
-export const IPC_PIPES_QUESTION_COUNT = 14
-
+export const IPC_PIPES_QUESTION_COUNT = 16

@@ -57,6 +57,24 @@ const ASYNC_COMMUNICATION_QUESTIONS: NetworkingQuestion[] = [
 
 const SIGNAL_HANDLERS_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'signals-fill-blank-safe-write',
+    kind: 'text',
+    prompt: 'Fill in the blank with a signal-safe output call.',
+    code: `void handler(int signum) {
+  _____(1, "Signal\\n", 7);
+}`,
+    requiredConcepts: [
+      { label: 'write()', keywords: ['write', 'write()'] },
+    ],
+    answerDisplay: '`write`',
+    explanationSteps: [
+      'Signal handlers should use async-signal-safe functions.',
+      'write is a standard safe option for simple output.',
+      'stdio calls like printf are unsafe in handlers.',
+    ],
+    conceptSummary: 'Code-completion: prefer write in signal handlers.',
+  },
+  {
     id: 'signals-handler-definition',
     kind: 'text',
     prompt: 'What is a signal handler, and when does it run?',
@@ -98,6 +116,23 @@ const SIGNAL_HANDLERS_QUESTIONS: NetworkingQuestion[] = [
 ]
 
 const SIGACTION_QUESTIONS: NetworkingQuestion[] = [
+  {
+    id: 'signals-complete-sa-handler-line',
+    kind: 'text',
+    prompt: 'Complete the `sigaction` setup line.',
+    code: `struct sigaction sa;
+sa._____ = handler;`,
+    requiredConcepts: [
+      { label: 'sa_handler', keywords: ['sa_handler'] },
+    ],
+    answerDisplay: '`sa_handler`',
+    explanationSteps: [
+      'sa_handler holds the function pointer callback.',
+      'sigaction reads this structure to install behavior.',
+      'Correct field selection is key for handler registration.',
+    ],
+    conceptSummary: 'Signal setup completion: handler pointer goes in sa_handler.',
+  },
   {
     id: 'signals-sigaction-purpose',
     kind: 'mcq',
@@ -286,4 +321,4 @@ export function generateCommonSignalsQuestion(): NetworkingQuestion {
   return randomPick(COMMON_SIGNALS_QUESTIONS)
 }
 
-export const SIGNALS_QUESTION_COUNT = 13
+export const SIGNALS_QUESTION_COUNT = 15
