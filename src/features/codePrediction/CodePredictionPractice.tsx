@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
 import { useSessionContext } from '../../components/SessionContext'
 import { useTopicContext } from '../../components/TopicContext'
+import { useUnitNavigationContext } from '../../components/UnitNavigationContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
 import {
@@ -34,6 +35,9 @@ export function CodePredictionPractice({
   const resetPulse = useResetPulse()
   const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
+  const { hasNextSubtopic, goToNextSubtopic } = useUnitNavigationContext()
+  const seenQuestionIdsRef = useRef<Set<string>>(new Set())
+  const lastQuestionIdRef = useRef<string | null>(null)
 
   const resetAnswerOnly = () => {
     if (!question) return
@@ -45,7 +49,40 @@ export function CodePredictionPractice({
 
   const generate = () => {
     transition.runQuestionTransition(() => {
-      setQuestion(generateQuestion())
+      const selectQuestion = () => {
+        let fallback = generateQuestion()
+        for (let i = 0; i < 24; i += 1) {
+          const candidate = generateQuestion()
+          fallback = candidate
+          const unseen = !seenQuestionIdsRef.current.has(candidate.id)
+          const notSameAsLast = candidate.id !== lastQuestionIdRef.current
+          if (unseen && notSameAsLast) {
+            return { question: candidate, exhausted: false }
+          }
+        }
+        return { question: fallback, exhausted: true }
+      }
+
+      let { question: nextQuestion, exhausted } = selectQuestion()
+      if (exhausted) {
+        const wantsNext =
+          hasNextSubtopic &&
+          window.confirm(
+            'You have seen all questions in this topic. Move to the next topic?',
+          )
+        if (wantsNext) {
+          goToNextSubtopic()
+          return
+        }
+        seenQuestionIdsRef.current.clear()
+        const retry = selectQuestion()
+        nextQuestion = retry.question
+      }
+
+      seenQuestionIdsRef.current.add(nextQuestion.id)
+      lastQuestionIdRef.current = nextQuestion.id
+
+      setQuestion(nextQuestion)
       setAnswer('')
       setChecked(false)
       setResult(null)

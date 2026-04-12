@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AllTopicsProvider } from './AllTopicsContext'
 import { TopicProvider } from './TopicContext'
+import { UnitNavigationProvider } from './UnitNavigationContext'
 import { TabNav } from './TabNav'
 import { PlaceholderPanel } from './PlaceholderPanel'
 import type { SubtopicId } from '../lib/study'
@@ -51,6 +52,17 @@ export function UnitScaffold({
   const selected = subtopics.find((subtopic) => subtopic.id === activeSubtopic)
   const activeAllTopic =
     renderedSubtopics[allTopicsIndex % Math.max(renderedSubtopics.length, 1)]
+  const selectedRenderedIndex = renderedSubtopics.findIndex(
+    (subtopic) => subtopic.id === selected?.id,
+  )
+  const hasNextSubtopic =
+    selectedRenderedIndex >= 0 && selectedRenderedIndex < renderedSubtopics.length - 1
+  const goToNextSubtopic = () => {
+    if (!hasNextSubtopic) return
+    const next = renderedSubtopics[selectedRenderedIndex + 1]
+    if (!next) return
+    setActiveSubtopic(next.id)
+  }
 
   const tabOptions = hasAllTopics
     ? [{ id: ALL_TOPICS_ID, label: 'All Topics' }, ...subtopics]
@@ -111,14 +123,21 @@ export function UnitScaffold({
           </div>
         </div>
       ) : selected?.render ? (
-        <TopicProvider
+        <UnitNavigationProvider
           value={{
-            unitLabel,
-            subtopicLabel: selected.label,
+            hasNextSubtopic,
+            goToNextSubtopic,
           }}
         >
-          {selected.render()}
-        </TopicProvider>
+          <TopicProvider
+            value={{
+              unitLabel,
+              subtopicLabel: selected.label,
+            }}
+          >
+            {selected.render()}
+          </TopicProvider>
+        </UnitNavigationProvider>
       ) : (
         <PlaceholderPanel
           unitLabel={unitLabel}

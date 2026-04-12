@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
 import { useSessionContext } from '../../components/SessionContext'
@@ -54,6 +54,7 @@ export function SchedulingSimulationPractice({
   const resetPulse = useResetPulse()
   const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
+  const lastQuestionSignatureRef = useRef<string | null>(null)
 
   const resetAnswerInputs = () => {
     setOrderAnswer('')
@@ -66,7 +67,7 @@ export function SchedulingSimulationPractice({
 
   const generate = () => {
     transition.runQuestionTransition(() => {
-      const nextQuestion =
+      const generateFromMode = () =>
         selectedMode === 'FCFS'
           ? generators.fcfs()
           : selectedMode === 'SJF'
@@ -78,6 +79,28 @@ export function SchedulingSimulationPractice({
                 : selectedMode === 'Priority'
                   ? generators.priority()
                   : generators.random()
+
+      let nextQuestion = generateFromMode()
+      let signature = `${nextQuestion.algorithm}|${nextQuestion.quantum ?? '-'}|${
+        nextQuestion.preemptivePriority ?? '-'
+      }|${nextQuestion.processes
+        .map(
+          (process) =>
+            `${process.id}:${process.arrivalTime}:${process.burstTime}:${process.priority ?? '-'}`,
+        )
+        .join('|')}`
+      for (let i = 0; i < 18 && signature === lastQuestionSignatureRef.current; i += 1) {
+        nextQuestion = generateFromMode()
+        signature = `${nextQuestion.algorithm}|${nextQuestion.quantum ?? '-'}|${
+          nextQuestion.preemptivePriority ?? '-'
+        }|${nextQuestion.processes
+          .map(
+            (process) =>
+              `${process.id}:${process.arrivalTime}:${process.burstTime}:${process.priority ?? '-'}`,
+          )
+          .join('|')}`
+      }
+      lastQuestionSignatureRef.current = signature
       setQuestion(nextQuestion)
       resetAnswerInputs()
       setHasCountedAttempt(false)

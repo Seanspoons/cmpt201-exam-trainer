@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
 import { useSessionContext } from '../../components/SessionContext'
@@ -56,6 +56,7 @@ export function PageReplacementTab() {
   const resetPulse = useResetPulse()
   const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
+  const lastQuestionSignatureRef = useRef<string | null>(null)
 
   const solution = question ? solvePageReplacement(question) : null
 
@@ -68,11 +69,18 @@ export function PageReplacementTab() {
 
   const generateQuestion = () => {
     transition.runQuestionTransition(() => {
-      setQuestion(
-        generatePageReplacementQuestion(
-          selectedAlgorithm === 'Random' ? undefined : selectedAlgorithm,
-        ),
+      let next = generatePageReplacementQuestion(
+        selectedAlgorithm === 'Random' ? undefined : selectedAlgorithm,
       )
+      let signature = `${next.algorithm}|${next.frameCount}|${next.referenceString.join(',')}`
+      for (let i = 0; i < 18 && signature === lastQuestionSignatureRef.current; i += 1) {
+        next = generatePageReplacementQuestion(
+          selectedAlgorithm === 'Random' ? undefined : selectedAlgorithm,
+        )
+        signature = `${next.algorithm}|${next.frameCount}|${next.referenceString.join(',')}`
+      }
+      lastQuestionSignatureRef.current = signature
+      setQuestion(next)
       resetAnswerInputs()
       setHasCountedAttempt(false)
       setAttemptId(null)

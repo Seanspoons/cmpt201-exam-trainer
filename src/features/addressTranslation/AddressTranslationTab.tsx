@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
 import { useSessionContext } from '../../components/SessionContext'
@@ -30,6 +30,7 @@ export function AddressTranslationTab() {
   const resetPulse = useResetPulse()
   const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
+  const lastQuestionSignatureRef = useRef<string | null>(null)
 
   const solution = question ? solveAddressTranslation(question) : null
 
@@ -49,7 +50,22 @@ export function AddressTranslationTab() {
 
   const generateQuestion = () => {
     transition.runQuestionTransition(() => {
-      setQuestion(generateAddressTranslationQuestion())
+      let next = generateAddressTranslationQuestion()
+      let signature = `${next.pageSize}|${next.virtualAddress}|${Object.entries(
+        next.pageTable,
+      )
+        .map(([p, f]) => `${p}:${f}`)
+        .join(',')}`
+      for (let i = 0; i < 18 && signature === lastQuestionSignatureRef.current; i += 1) {
+        next = generateAddressTranslationQuestion()
+        signature = `${next.pageSize}|${next.virtualAddress}|${Object.entries(
+          next.pageTable,
+        )
+          .map(([p, f]) => `${p}:${f}`)
+          .join(',')}`
+      }
+      lastQuestionSignatureRef.current = signature
+      setQuestion(next)
       resetInputs()
       setHasCountedAttempt(false)
       setAttemptId(null)
