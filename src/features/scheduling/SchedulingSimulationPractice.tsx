@@ -13,7 +13,14 @@ import {
 
 type SchedulingSimulationPracticeProps = {
   title: string
-  generateQuestion: () => SchedulingSimulationQuestion
+  generators: {
+    random: () => SchedulingSimulationQuestion
+    fcfs: () => SchedulingSimulationQuestion
+    sjf: () => SchedulingSimulationQuestion
+    srtf: () => SchedulingSimulationQuestion
+    roundRobin: () => SchedulingSimulationQuestion
+    priority: () => SchedulingSimulationQuestion
+  }
 }
 
 type CheckResult = {
@@ -27,8 +34,11 @@ function isNumericClose(actual: number, expected: number): boolean {
 
 export function SchedulingSimulationPractice({
   title,
-  generateQuestion,
+  generators,
 }: SchedulingSimulationPracticeProps) {
+  const [selectedMode, setSelectedMode] = useState<
+    'Random' | 'FCFS' | 'SJF' | 'SRTF' | 'Round Robin' | 'Priority'
+  >('Random')
   const [question, setQuestion] = useState<SchedulingSimulationQuestion | null>(null)
   const [orderAnswer, setOrderAnswer] = useState('')
   const [totalWaitAnswer, setTotalWaitAnswer] = useState('')
@@ -52,7 +62,19 @@ export function SchedulingSimulationPractice({
 
   const generate = () => {
     transition.runQuestionTransition(() => {
-      setQuestion(generateQuestion())
+      const nextQuestion =
+        selectedMode === 'FCFS'
+          ? generators.fcfs()
+          : selectedMode === 'SJF'
+            ? generators.sjf()
+            : selectedMode === 'SRTF'
+              ? generators.srtf()
+              : selectedMode === 'Round Robin'
+                ? generators.roundRobin()
+                : selectedMode === 'Priority'
+                  ? generators.priority()
+                  : generators.random()
+      setQuestion(nextQuestion)
       resetAnswerInputs()
     })
   }
@@ -109,6 +131,26 @@ export function SchedulingSimulationPractice({
   return (
     <div>
       <h3 className="section-title">{title}</h3>
+      <div className="nested-choice-panel nested-choice-panel--scheduling">
+        <p className="nested-choice-label">Scheduling Algorithm</p>
+        <div className="nested-choice-row" role="tablist" aria-label="Scheduling algorithm">
+          {(
+            ['Random', 'FCFS', 'SJF', 'SRTF', 'Round Robin', 'Priority'] as const
+          ).map((mode) => (
+            <button
+              key={mode}
+              role="tab"
+              aria-selected={selectedMode === mode}
+              className={`nested-choice-button nested-choice-button--scheduling ${
+                selectedMode === mode ? 'nested-choice-button--active' : ''
+              }`}
+              onClick={() => setSelectedMode(mode)}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+      </div>
       <QuestionControlBar
         hasQuestion={Boolean(question)}
         isTransitioning={transition.isTransitioning}

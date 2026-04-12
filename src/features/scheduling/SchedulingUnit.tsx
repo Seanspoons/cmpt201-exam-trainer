@@ -9,6 +9,7 @@ import {
 import {
   generateFcfsQuestion,
   generatePriorityQuestion,
+  generateRandomSchedulingQuestion,
   generateRoundRobinQuestion,
   generateSjfQuestion,
   generateSrtfQuestion,
@@ -20,57 +21,20 @@ export function SchedulingUnit() {
       unitLabel="Scheduling"
       subtopics={[
         {
-          id: 'fcfs',
-          label: 'FCFS (First Come First Served)',
+          id: 'scheduling-drills',
+          label: 'Scheduling Drills',
           render: () => (
             <SchedulingSimulationPractice
-              key="sched-fcfs"
-              title="Scheduling > FCFS (First Come First Served)"
-              generateQuestion={generateFcfsQuestion}
-            />
-          ),
-        },
-        {
-          id: 'sjf',
-          label: 'SJF (Shortest Job First)',
-          render: () => (
-            <SchedulingSimulationPractice
-              key="sched-sjf"
-              title="Scheduling > SJF (non-preemptive)"
-              generateQuestion={generateSjfQuestion}
-            />
-          ),
-        },
-        {
-          id: 'srtf',
-          label: 'SRTF (Shortest Remaining Time First)',
-          render: () => (
-            <SchedulingSimulationPractice
-              key="sched-srtf"
-              title="Scheduling > SRTF (preemptive)"
-              generateQuestion={generateSrtfQuestion}
-            />
-          ),
-        },
-        {
-          id: 'round-robin',
-          label: 'Round Robin',
-          render: () => (
-            <SchedulingSimulationPractice
-              key="sched-rr"
-              title="Scheduling > Round Robin"
-              generateQuestion={generateRoundRobinQuestion}
-            />
-          ),
-        },
-        {
-          id: 'priority-scheduling',
-          label: 'Priority Scheduling',
-          render: () => (
-            <SchedulingSimulationPractice
-              key="sched-priority"
-              title="Scheduling > Priority Scheduling"
-              generateQuestion={generatePriorityQuestion}
+              key="sched-drills"
+              title="Scheduling > Algorithm Drills"
+              generators={{
+                random: generateRandomSchedulingQuestion,
+                fcfs: generateFcfsQuestion,
+                sjf: generateSjfQuestion,
+                srtf: generateSrtfQuestion,
+                roundRobin: generateRoundRobinQuestion,
+                priority: generatePriorityQuestion,
+              }}
             />
           ),
         },

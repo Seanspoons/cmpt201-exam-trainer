@@ -132,6 +132,16 @@ export function generatePriorityQuestion(): SchedulingSimulationQuestion {
   )
 }
 
+export function generateRandomSchedulingQuestion(): SchedulingSimulationQuestion {
+  return randomPick([
+    generateFcfsQuestion,
+    generateSjfQuestion,
+    generateSrtfQuestion,
+    generateRoundRobinQuestion,
+    generatePriorityQuestion,
+  ])()
+}
+
 export function buildSchedulingReasoning(
   question: SchedulingSimulationQuestion,
 ): string[] {
