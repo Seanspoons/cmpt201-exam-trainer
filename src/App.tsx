@@ -133,7 +133,7 @@ function App() {
                 {unit.implemented ? (
                   <span className="unit-count-badge">
                     {unit.questionCount === 'infinity'
-                      ? '∞'
+                      ? '∞Q'
                       : `${unit.questionCount ?? 0}Q`}
                   </span>
                 ) : (
