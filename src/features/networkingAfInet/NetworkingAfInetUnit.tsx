@@ -1,4 +1,12 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
+import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
+import {
+  generateAfInetByteOrderQuestion,
+  generateAfInetIpv4Question,
+  generateAfInetSendRecvQuestion,
+  generateAfInetSpecialAddressQuestion,
+  generateAfInetStructureQuestion,
+} from './questions'
 
 export function NetworkingAfInetUnit() {
   return (
@@ -6,14 +14,59 @@ export function NetworkingAfInetUnit() {
       unitLabel="Networking: AF_INET"
       subtopics={[
         {
-          id: 'afinet-addr-structs',
-          label: 'Address Structures',
-          plannedDrills: ['Fill sockaddr_in fields correctly', 'Convert host/network byte order'],
+          id: 'sockaddr-in-structure',
+          label: 'sockaddr_in Structure',
+          render: () => (
+            <NetworkingDrillPractice
+              key="afinet-struct"
+              title="Networking: AF_INET > sockaddr_in Structure"
+              generateQuestion={generateAfInetStructureQuestion}
+            />
+          ),
         },
         {
-          id: 'afinet-endianness',
-          label: 'Endianness',
-          plannedDrills: ['Choose htons/htonl usage correctly', 'Debug wrong-port or wrong-ip issues'],
+          id: 'ipv4-address-handling',
+          label: 'IPv4 Address Handling',
+          render: () => (
+            <NetworkingDrillPractice
+              key="afinet-ipv4"
+              title="Networking: AF_INET > IPv4 Address Handling"
+              generateQuestion={generateAfInetIpv4Question}
+            />
+          ),
+        },
+        {
+          id: 'ports-special-addresses',
+          label: 'Ports and Special Addresses',
+          render: () => (
+            <NetworkingDrillPractice
+              key="afinet-special"
+              title="Networking: AF_INET > Ports and Special Addresses"
+              generateQuestion={generateAfInetSpecialAddressQuestion}
+            />
+          ),
+        },
+        {
+          id: 'network-byte-order',
+          label: 'Network Byte Order',
+          render: () => (
+            <NetworkingDrillPractice
+              key="afinet-byteorder"
+              title="Networking: AF_INET > Network Byte Order"
+              generateQuestion={generateAfInetByteOrderQuestion}
+            />
+          ),
+        },
+        {
+          id: 'send-recv-basics',
+          label: 'send()/recv() Basics',
+          render: () => (
+            <NetworkingDrillPractice
+              key="afinet-sendrecv"
+              title="Networking: AF_INET > send()/recv() Basics"
+              generateQuestion={generateAfInetSendRecvQuestion}
+            />
+          ),
         },
       ]}
     />
