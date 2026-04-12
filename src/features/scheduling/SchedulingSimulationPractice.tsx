@@ -48,10 +48,11 @@ export function SchedulingSimulationPractice({
   const [timelineAnswer, setTimelineAnswer] = useState<number | null>(null)
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
+  const [attemptId, setAttemptId] = useState<number | null>(null)
   const [result, setResult] = useState<CheckResult | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
-  const { recordAttempt } = useSessionContext()
+  const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerInputs = () => {
@@ -80,6 +81,7 @@ export function SchedulingSimulationPractice({
       setQuestion(nextQuestion)
       resetAnswerInputs()
       setHasCountedAttempt(false)
+      setAttemptId(null)
     })
   }
 
@@ -128,11 +130,12 @@ export function SchedulingSimulationPractice({
       missingConceptLabels: missing,
     })
     if (!hasCountedAttempt) {
-      recordAttempt({
+      const id = recordAttempt({
         unitLabel,
         subtopicLabel,
         isCorrect: status === 'correct',
       })
+      setAttemptId(id)
       setHasCountedAttempt(true)
     }
     setChecked(true)
@@ -269,6 +272,16 @@ export function SchedulingSimulationPractice({
             <AnswerFeedbackCard
               status={result.status}
               missingConceptLabels={result.missingConceptLabels}
+              onMarkCorrect={
+                result.status === 'partial'
+                  ? () => {
+                      if (attemptId !== null) {
+                        overrideAttemptResult(attemptId, true)
+                      }
+                      setResult({ status: 'correct', missingConceptLabels: [] })
+                    }
+                  : undefined
+              }
               answerContent={
                 <>
                   <p>

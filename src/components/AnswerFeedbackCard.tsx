@@ -17,6 +17,7 @@ type AnswerFeedbackCardProps = {
   explanationContent: ReactNode
   conceptSummary?: ReactNode
   extraContent?: ReactNode
+  onMarkCorrect?: () => void
 }
 
 function getStatusLabel(status: FeedbackStatus): string {
@@ -38,6 +39,7 @@ export function AnswerFeedbackCard({
   explanationContent,
   conceptSummary,
   extraContent,
+  onMarkCorrect,
 }: AnswerFeedbackCardProps) {
   return (
     <div className={`answer-feedback answer-feedback--${status}`} role="status" aria-live="polite">
@@ -49,10 +51,17 @@ export function AnswerFeedbackCard({
       </div>
 
       {status === 'partial' && missingConceptLabels.length > 0 ? (
-        <p className="answer-feedback-note">
-          Partially correct — missing key concept:{' '}
-          <strong>{missingConceptLabels.join(', ')}</strong>
-        </p>
+        <div className="answer-feedback-note-row">
+          <p className="answer-feedback-note">
+            Partially correct — missing key concept:{' '}
+            <strong>{missingConceptLabels.join(', ')}</strong>
+          </p>
+          {onMarkCorrect ? (
+            <button className="button-secondary" onClick={onMarkCorrect}>
+              I got it correct
+            </button>
+          ) : null}
+        </div>
       ) : null}
 
       <section className="answer-feedback-section">

@@ -24,10 +24,11 @@ export function ConcurrencyDebugTab() {
   const [textAnswer, setTextAnswer] = useState('')
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
+  const [attemptId, setAttemptId] = useState<number | null>(null)
   const [result, setResult] = useState<CheckResult | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
-  const { recordAttempt } = useSessionContext()
+  const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerInputs = () => {
@@ -56,6 +57,7 @@ export function ConcurrencyDebugTab() {
       }
       resetAnswerInputs()
       setHasCountedAttempt(false)
+      setAttemptId(null)
     })
   }
 
@@ -72,11 +74,12 @@ export function ConcurrencyDebugTab() {
       if (mcqAnswer === null) return
       const isCorrect = mcqAnswer === question.correctOption
       if (!hasCountedAttempt) {
-        recordAttempt({
+        const id = recordAttempt({
           unitLabel,
           subtopicLabel,
           isCorrect,
         })
+        setAttemptId(id)
         setHasCountedAttempt(true)
       }
       setResult({
@@ -92,11 +95,12 @@ export function ConcurrencyDebugTab() {
       question.requiredConcepts,
     )
     if (!hasCountedAttempt) {
-      recordAttempt({
+      const id = recordAttempt({
         unitLabel,
         subtopicLabel,
         isCorrect: grade.status === 'correct',
       })
+      setAttemptId(id)
       setHasCountedAttempt(true)
     }
     setResult({
@@ -186,6 +190,16 @@ export function ConcurrencyDebugTab() {
             <AnswerFeedbackCard
               status={result.status}
               missingConceptLabels={result.missingConceptLabels}
+              onMarkCorrect={
+                result.status === 'partial'
+                  ? () => {
+                      if (attemptId !== null) {
+                        overrideAttemptResult(attemptId, true)
+                      }
+                      setResult({ status: 'correct', missingConceptLabels: [] })
+                    }
+                  : undefined
+              }
               answerContent={
                 question.type === 'mcq' ? (
                   <p>

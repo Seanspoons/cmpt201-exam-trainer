@@ -28,10 +28,11 @@ export function SchedulingConceptPractice({
   const [matchOptionsOrder, setMatchOptionsOrder] = useState<string[]>([])
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
+  const [attemptId, setAttemptId] = useState<number | null>(null)
   const [result, setResult] = useState<CheckResult | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
-  const { recordAttempt } = useSessionContext()
+  const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerInputs = () => {
@@ -63,6 +64,7 @@ export function SchedulingConceptPractice({
       }
       resetAnswerInputs()
       setHasCountedAttempt(false)
+      setAttemptId(null)
     })
   }
 
@@ -78,11 +80,12 @@ export function SchedulingConceptPractice({
     if (question.type === 'mcq') {
       const isCorrect = mcqAnswer === question.correctOption
       if (!hasCountedAttempt) {
-        recordAttempt({
+        const id = recordAttempt({
           unitLabel,
           subtopicLabel,
           isCorrect,
         })
+        setAttemptId(id)
         setHasCountedAttempt(true)
       }
       setResult({ status: isCorrect ? 'correct' : 'incorrect', missingConceptLabels: [] })
@@ -101,11 +104,12 @@ export function SchedulingConceptPractice({
           : 'incorrect'
     setResult({ status, missingConceptLabels: missing })
     if (!hasCountedAttempt) {
-      recordAttempt({
+      const id = recordAttempt({
         unitLabel,
         subtopicLabel,
         isCorrect: status === 'correct',
       })
+      setAttemptId(id)
       setHasCountedAttempt(true)
     }
     setChecked(true)
@@ -220,6 +224,16 @@ export function SchedulingConceptPractice({
             <AnswerFeedbackCard
               status={result.status}
               missingConceptLabels={result.missingConceptLabels}
+              onMarkCorrect={
+                result.status === 'partial'
+                  ? () => {
+                      if (attemptId !== null) {
+                        overrideAttemptResult(attemptId, true)
+                      }
+                      setResult({ status: 'correct', missingConceptLabels: [] })
+                    }
+                  : undefined
+              }
               answerContent={
                 question.type === 'mcq' ? (
                   <p>

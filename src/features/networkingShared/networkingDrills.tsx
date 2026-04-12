@@ -68,10 +68,11 @@ export function NetworkingDrillPractice({
   const [matchOptionsOrder, setMatchOptionsOrder] = useState<string[]>([])
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
+  const [attemptId, setAttemptId] = useState<number | null>(null)
   const [result, setResult] = useState<CheckResult | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
-  const { recordAttempt } = useSessionContext()
+  const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerInputs = () => {
@@ -108,6 +109,7 @@ export function NetworkingDrillPractice({
       }
       resetAnswerInputs()
       setHasCountedAttempt(false)
+      setAttemptId(null)
     })
   }
 
@@ -127,11 +129,12 @@ export function NetworkingDrillPractice({
     } else if (question.kind === 'text') {
       const grade = gradeByConceptGroups(textAnswer, question.requiredConcepts)
       if (!hasCountedAttempt) {
-        recordAttempt({
+        const id = recordAttempt({
           unitLabel,
           subtopicLabel,
           isCorrect: grade.status === 'correct',
         })
+        setAttemptId(id)
         setHasCountedAttempt(true)
       }
       setResult({
@@ -147,11 +150,12 @@ export function NetworkingDrillPractice({
     }
 
     if (!hasCountedAttempt) {
-      recordAttempt({
+      const id = recordAttempt({
         unitLabel,
         subtopicLabel,
         isCorrect,
       })
+      setAttemptId(id)
       setHasCountedAttempt(true)
     }
 
@@ -350,6 +354,16 @@ export function NetworkingDrillPractice({
             <AnswerFeedbackCard
               status={result.status}
               missingConceptLabels={result.missingConceptLabels}
+              onMarkCorrect={
+                result.status === 'partial'
+                  ? () => {
+                      if (attemptId !== null) {
+                        overrideAttemptResult(attemptId, true)
+                      }
+                      setResult({ status: 'correct', missingConceptLabels: [] })
+                    }
+                  : undefined
+              }
               answerContent={renderCorrectAnswer()}
               explanationContent={
                 <div className="table-scroll">

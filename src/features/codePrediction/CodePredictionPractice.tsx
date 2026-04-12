@@ -28,10 +28,11 @@ export function CodePredictionPractice({
   const [answer, setAnswer] = useState('')
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
+  const [attemptId, setAttemptId] = useState<number | null>(null)
   const [result, setResult] = useState<CheckResult | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
-  const { recordAttempt } = useSessionContext()
+  const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerOnly = () => {
@@ -49,6 +50,7 @@ export function CodePredictionPractice({
       setChecked(false)
       setResult(null)
       setHasCountedAttempt(false)
+      setAttemptId(null)
     })
   }
 
@@ -56,11 +58,12 @@ export function CodePredictionPractice({
     if (!question) return
     const grade = gradePredictionAnswer(answer, question)
     if (!hasCountedAttempt) {
-      recordAttempt({
+      const id = recordAttempt({
         unitLabel,
         subtopicLabel,
         isCorrect: grade.status === 'correct',
       })
+      setAttemptId(id)
       setHasCountedAttempt(true)
     }
     setResult({
@@ -121,6 +124,16 @@ export function CodePredictionPractice({
             <AnswerFeedbackCard
               status={result.status}
               missingConceptLabels={result.missingConceptLabels}
+              onMarkCorrect={
+                result.status === 'partial'
+                  ? () => {
+                      if (attemptId !== null) {
+                        overrideAttemptResult(attemptId, true)
+                      }
+                      setResult({ status: 'correct', missingConceptLabels: [] })
+                    }
+                  : undefined
+              }
               answerContent={
                 <>
                   <p>Accepted answer(s):</p>

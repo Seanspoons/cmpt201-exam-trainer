@@ -589,6 +589,19 @@
   color: #5c4f27;
 }
 
+.answer-feedback-note-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.answer-feedback-note-row .answer-feedback-note {
+  margin: 0;
+}
+
 .answer-feedback-section {
   border: 1px solid var(--border);
   border-radius: 8px;
