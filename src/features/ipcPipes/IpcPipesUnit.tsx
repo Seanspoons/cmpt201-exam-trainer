@@ -1,6 +1,14 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
-import { CodePredictionPractice } from '../codePrediction/CodePredictionPractice'
-import { generatePipeQuestion } from '../codePrediction/questions'
+import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
+import {
+  generateAnonymousPipeQuestion,
+  generateClosingPipeEndsQuestion,
+  generateDup2RedirectionQuestion,
+  generateFifoQuestion,
+  generateMqContrastQuestion,
+  generateParentChildPipeQuestion,
+  generatePipeSemanticsQuestion,
+} from './questions'
 
 export function IpcPipesUnit() {
   return (
@@ -8,35 +16,79 @@ export function IpcPipesUnit() {
       unitLabel="IPC: Pipes"
       subtopics={[
         {
-          id: 'pipes-basic-usage',
-          label: 'Basic pipe usage',
+          id: 'anonymous-pipes',
+          label: 'Anonymous Pipes',
           render: () => (
-            <CodePredictionPractice
-              key="ipc-pipes-basic"
-              title="IPC: Pipes > Basic pipe usage"
-              generateQuestion={generatePipeQuestion}
+            <NetworkingDrillPractice
+              key="ipc-pipes-anonymous"
+              title="IPC: Pipes > Anonymous Pipes"
+              generateQuestion={generateAnonymousPipeQuestion}
             />
           ),
         },
         {
-          id: 'pipes-parent-child',
+          id: 'parent-child-communication',
           label: 'Parent/child communication',
           render: () => (
-            <CodePredictionPractice
+            <NetworkingDrillPractice
               key="ipc-pipes-parent-child"
-              title="IPC: Pipes > Parent/child communication"
-              generateQuestion={generatePipeQuestion}
+              title="IPC: Pipes > Parent-Child Communication"
+              generateQuestion={generateParentChildPipeQuestion}
             />
           ),
         },
         {
-          id: 'pipes-blocking-close',
-          label: 'Blocking and closing ends',
+          id: 'pipe-semantics',
+          label: 'Pipe Semantics',
           render: () => (
-            <CodePredictionPractice
-              key="ipc-pipes-blocking"
-              title="IPC: Pipes > Blocking and closing ends"
-              generateQuestion={generatePipeQuestion}
+            <NetworkingDrillPractice
+              key="ipc-pipes-semantics"
+              title="IPC: Pipes > Pipe Semantics"
+              generateQuestion={generatePipeSemanticsQuestion}
+            />
+          ),
+        },
+        {
+          id: 'closing-pipe-ends',
+          label: 'Closing Pipe Ends',
+          render: () => (
+            <NetworkingDrillPractice
+              key="ipc-pipes-closing-ends"
+              title="IPC: Pipes > Closing Pipe Ends"
+              generateQuestion={generateClosingPipeEndsQuestion}
+            />
+          ),
+        },
+        {
+          id: 'dup2-redirection',
+          label: 'dup2() and Redirection',
+          render: () => (
+            <NetworkingDrillPractice
+              key="ipc-pipes-dup2"
+              title="IPC: Pipes > dup2() and Redirection"
+              generateQuestion={generateDup2RedirectionQuestion}
+            />
+          ),
+        },
+        {
+          id: 'fifo-named-pipes',
+          label: 'FIFOs (Named Pipes)',
+          render: () => (
+            <NetworkingDrillPractice
+              key="ipc-pipes-fifo"
+              title="IPC: Pipes > FIFOs (Named Pipes)"
+              generateQuestion={generateFifoQuestion}
+            />
+          ),
+        },
+        {
+          id: 'message-queue-contrast',
+          label: 'Message Queues (Conceptual Contrast)',
+          render: () => (
+            <NetworkingDrillPractice
+              key="ipc-pipes-mq-contrast"
+              title="IPC: Pipes > Message Queue Contrast"
+              generateQuestion={generateMqContrastQuestion}
             />
           ),
         },
