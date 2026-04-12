@@ -46,7 +46,7 @@ export function QuestionControlBar({
         disabled={disableReset || isTransitioning}
       >
         <FiRotateCcw aria-hidden="true" />
-        <span>Reset Answer</span>
+        <span>Clear Answer</span>
       </button>
       {isTransitioning ? (
         <span className="question-control-note" role="status" aria-live="polite">
