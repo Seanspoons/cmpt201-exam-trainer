@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
+import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useQuestionTransition } from '../../components/useQuestionTransition'
+import { useResetPulse } from '../../components/useResetPulse'
 import {
   formatFrames,
   formatReferenceBits,
@@ -47,19 +50,33 @@ export function PageReplacementTab() {
   const [result, setResult] = useState<CheckResult | null>(null)
   const [attempts, setAttempts] = useState(0)
   const [correct, setCorrect] = useState(0)
+  const transition = useQuestionTransition()
+  const resetPulse = useResetPulse()
 
   const solution = question ? solvePageReplacement(question) : null
 
-  const generateQuestion = () => {
-    setQuestion(
-      generatePageReplacementQuestion(
-        selectedAlgorithm === 'Random' ? undefined : selectedAlgorithm,
-      ),
-    )
+  const resetAnswerInputs = () => {
     setFaultAnswer('')
     setFrameAnswer('')
     setChecked(false)
     setResult(null)
+  }
+
+  const generateQuestion = () => {
+    transition.runQuestionTransition(() => {
+      setQuestion(
+        generatePageReplacementQuestion(
+          selectedAlgorithm === 'Random' ? undefined : selectedAlgorithm,
+        ),
+      )
+      resetAnswerInputs()
+    })
+  }
+
+  const resetAnswerOnly = () => {
+    if (!question) return
+    resetAnswerInputs()
+    resetPulse.triggerResetPulse()
   }
 
   const checkAnswer = () => {
@@ -124,17 +141,27 @@ export function PageReplacementTab() {
             <option value="Second Chance">Second Chance</option>
           </select>
         </label>
-        <button className="button-secondary" onClick={generateQuestion}>
-          Generate Question
-        </button>
-        <button className="button-secondary" onClick={generateQuestion}>
-          Reset / New Question
-        </button>
       </div>
+      <QuestionControlBar
+        hasQuestion={Boolean(question)}
+        isTransitioning={transition.isTransitioning}
+        onNewQuestion={generateQuestion}
+        onResetAnswer={resetAnswerOnly}
+        disableReset={!question}
+      />
       <p className="small-note">
         Session score: {correct}/{attempts}
       </p>
 
+      <div
+        className={`question-stage ${
+          transition.phase === 'out'
+            ? 'question-stage--out'
+            : transition.phase === 'in'
+              ? 'question-stage--in'
+              : ''
+        }`}
+      >
       {question ? (
         <>
           <div className="question-box">
@@ -146,6 +173,11 @@ export function PageReplacementTab() {
             <p className="mono">{question.referenceString.join(', ')}</p>
           </div>
 
+          <div
+            className={`answer-input-region ${
+              resetPulse.isResetActive ? 'answer-input-region--reset' : ''
+            }`}
+          >
           <div className="field-grid">
             <div className="field">
               <label htmlFor="faultAnswer">Total page faults</label>
@@ -169,6 +201,7 @@ export function PageReplacementTab() {
                 ).join(', ')}`}
               />
             </div>
+          </div>
           </div>
 
           <button className="button-primary" onClick={checkAnswer}>
@@ -231,6 +264,7 @@ export function PageReplacementTab() {
       ) : (
         <p>Generate a question to start.</p>
       )}
+      </div>
     </div>
   )
 }

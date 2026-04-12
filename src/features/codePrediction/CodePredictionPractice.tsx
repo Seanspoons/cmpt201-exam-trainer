@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
+import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useQuestionTransition } from '../../components/useQuestionTransition'
+import { useResetPulse } from '../../components/useResetPulse'
 import {
   gradePredictionAnswer,
   type CodePredictionQuestion,
@@ -25,12 +28,24 @@ export function CodePredictionPractice({
   const [result, setResult] = useState<CheckResult | null>(null)
   const [attempts, setAttempts] = useState(0)
   const [correct, setCorrect] = useState(0)
+  const transition = useQuestionTransition()
+  const resetPulse = useResetPulse()
 
-  const generate = () => {
-    setQuestion(generateQuestion())
+  const resetAnswerOnly = () => {
+    if (!question) return
     setAnswer('')
     setChecked(false)
     setResult(null)
+    resetPulse.triggerResetPulse()
+  }
+
+  const generate = () => {
+    transition.runQuestionTransition(() => {
+      setQuestion(generateQuestion())
+      setAnswer('')
+      setChecked(false)
+      setResult(null)
+    })
   }
 
   const checkAnswer = () => {
@@ -50,24 +65,37 @@ export function CodePredictionPractice({
   return (
     <div>
       <h3 className="section-title">{title}</h3>
-      <div className="controls-row">
-        <button className="button-secondary" onClick={generate}>
-          Generate Question
-        </button>
-        <button className="button-secondary" onClick={generate}>
-          Reset / New Question
-        </button>
-      </div>
+      <QuestionControlBar
+        hasQuestion={Boolean(question)}
+        isTransitioning={transition.isTransitioning}
+        onNewQuestion={generate}
+        onResetAnswer={resetAnswerOnly}
+        disableReset={!question}
+      />
       <p className="small-note">
         Session score: {correct}/{attempts}
       </p>
 
+      <div
+        className={`question-stage ${
+          transition.phase === 'out'
+            ? 'question-stage--out'
+            : transition.phase === 'in'
+              ? 'question-stage--in'
+              : ''
+        }`}
+      >
       {question ? (
         <>
           <div className="question-box">
             <p>{question.prompt}</p>
             <pre className="inline-code-block">{question.code}</pre>
           </div>
+          <div
+            className={`answer-input-region ${
+              resetPulse.isResetActive ? 'answer-input-region--reset' : ''
+            }`}
+          >
           <div className="field">
             <label htmlFor={`${title}-codeAnswer`}>Your answer</label>
             <input
@@ -76,6 +104,7 @@ export function CodePredictionPractice({
               onChange={(event) => setAnswer(event.target.value)}
             />
             <p className="small-note">Checking ignores case and extra spaces.</p>
+          </div>
           </div>
           <div style={{ marginTop: '0.65rem' }}>
             <button className="button-primary" onClick={checkAnswer} disabled={!answer.trim()}>
@@ -131,6 +160,7 @@ export function CodePredictionPractice({
       ) : (
         <p>Generate a question to start.</p>
       )}
+      </div>
     </div>
   )
 }

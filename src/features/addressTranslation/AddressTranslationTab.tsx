@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
+import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useQuestionTransition } from '../../components/useQuestionTransition'
+import { useResetPulse } from '../../components/useResetPulse'
 import {
   binaryMatches,
   generateAddressTranslationQuestion,
@@ -21,6 +24,8 @@ export function AddressTranslationTab() {
   const [result, setResult] = useState<CheckResult | null>(null)
   const [attempts, setAttempts] = useState(0)
   const [correct, setCorrect] = useState(0)
+  const transition = useQuestionTransition()
+  const resetPulse = useResetPulse()
 
   const solution = question ? solveAddressTranslation(question) : null
 
@@ -32,9 +37,17 @@ export function AddressTranslationTab() {
     setResult(null)
   }
 
-  const generateQuestion = () => {
-    setQuestion(generateAddressTranslationQuestion())
+  const resetAnswerOnly = () => {
+    if (!question) return
     resetInputs()
+    resetPulse.triggerResetPulse()
+  }
+
+  const generateQuestion = () => {
+    transition.runQuestionTransition(() => {
+      setQuestion(generateAddressTranslationQuestion())
+      resetInputs()
+    })
   }
 
   const checkAnswer = () => {
@@ -56,18 +69,26 @@ export function AddressTranslationTab() {
   return (
     <div>
       <h2 className="section-title">Address Translation</h2>
-      <div className="controls-row">
-        <button className="button-secondary" onClick={generateQuestion}>
-          Generate Question
-        </button>
-        <button className="button-secondary" onClick={generateQuestion}>
-          Reset / New Question
-        </button>
-      </div>
+      <QuestionControlBar
+        hasQuestion={Boolean(question)}
+        isTransitioning={transition.isTransitioning}
+        onNewQuestion={generateQuestion}
+        onResetAnswer={resetAnswerOnly}
+        disableReset={!question}
+      />
       <p className="small-note">
         Session score: {correct}/{attempts}
       </p>
 
+      <div
+        className={`question-stage ${
+          transition.phase === 'out'
+            ? 'question-stage--out'
+            : transition.phase === 'in'
+              ? 'question-stage--in'
+              : ''
+        }`}
+      >
       {question && solution ? (
         <>
           <div className="question-box">
@@ -98,6 +119,11 @@ export function AddressTranslationTab() {
             </div>
           </div>
 
+          <div
+            className={`answer-input-region ${
+              resetPulse.isResetActive ? 'answer-input-region--reset' : ''
+            }`}
+          >
           <div className="field-grid">
             <div className="field">
               <label htmlFor="pageAnswer">Page number (binary)</label>
@@ -123,6 +149,7 @@ export function AddressTranslationTab() {
                 onChange={(event) => setPhysicalAnswer(event.target.value)}
               />
             </div>
+          </div>
           </div>
 
           <button className="button-primary" onClick={checkAnswer}>
@@ -179,6 +206,7 @@ export function AddressTranslationTab() {
       ) : (
         <p>Generate a question to start.</p>
       )}
+      </div>
     </div>
   )
 }

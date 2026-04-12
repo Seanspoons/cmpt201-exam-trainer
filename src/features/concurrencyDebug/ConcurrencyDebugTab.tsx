@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
+import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useQuestionTransition } from '../../components/useQuestionTransition'
+import { useResetPulse } from '../../components/useResetPulse'
 import { gradeByConceptGroups } from '../../lib/semanticGrading'
 import { randomPick } from '../../lib/random'
 import {
@@ -20,13 +23,27 @@ export function ConcurrencyDebugTab() {
   const [result, setResult] = useState<CheckResult | null>(null)
   const [attempts, setAttempts] = useState(0)
   const [correct, setCorrect] = useState(0)
+  const transition = useQuestionTransition()
+  const resetPulse = useResetPulse()
 
-  const generateQuestion = () => {
-    setQuestion(randomPick(CONCURRENCY_QUESTIONS))
+  const resetAnswerInputs = () => {
     setMcqAnswer(null)
     setTextAnswer('')
     setChecked(false)
     setResult(null)
+  }
+
+  const generateQuestion = () => {
+    transition.runQuestionTransition(() => {
+      setQuestion(randomPick(CONCURRENCY_QUESTIONS))
+      resetAnswerInputs()
+    })
+  }
+
+  const resetAnswerOnly = () => {
+    if (!question) return
+    resetAnswerInputs()
+    resetPulse.triggerResetPulse()
   }
 
   const checkAnswer = () => {
@@ -65,18 +82,26 @@ export function ConcurrencyDebugTab() {
   return (
     <div>
       <h2 className="section-title">Concurrency Debug</h2>
-      <div className="controls-row">
-        <button className="button-secondary" onClick={generateQuestion}>
-          Generate Question
-        </button>
-        <button className="button-secondary" onClick={generateQuestion}>
-          Reset / New Question
-        </button>
-      </div>
+      <QuestionControlBar
+        hasQuestion={Boolean(question)}
+        isTransitioning={transition.isTransitioning}
+        onNewQuestion={generateQuestion}
+        onResetAnswer={resetAnswerOnly}
+        disableReset={!question}
+      />
       <p className="small-note">
         Session score: {correct}/{attempts}
       </p>
 
+      <div
+        className={`question-stage ${
+          transition.phase === 'out'
+            ? 'question-stage--out'
+            : transition.phase === 'in'
+              ? 'question-stage--in'
+              : ''
+        }`}
+      >
       {question ? (
         <>
           <div className="question-box">
@@ -86,6 +111,11 @@ export function ConcurrencyDebugTab() {
             ) : null}
           </div>
 
+          <div
+            className={`answer-input-region ${
+              resetPulse.isResetActive ? 'answer-input-region--reset' : ''
+            }`}
+          >
           {question.type === 'mcq' ? (
             <div className="field">
               <label>Choose one:</label>
@@ -114,6 +144,7 @@ export function ConcurrencyDebugTab() {
               />
             </div>
           )}
+          </div>
 
           <div style={{ marginTop: '0.65rem' }}>
             <button
@@ -182,6 +213,7 @@ export function ConcurrencyDebugTab() {
       ) : (
         <p>Generate a question to start.</p>
       )}
+      </div>
     </div>
   )
 }
