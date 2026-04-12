@@ -1,16 +1,18 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
+import { MemoryStrategyPractice } from './MemoryStrategyPractice'
 import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
 import {
   generateAllocationProcessQuestion,
-  generateBestFitQuestion,
   generateCoalescingQuestion,
-  generateFirstFitQuestion,
-  generateFitStrategyComparisonQuestion,
   generateFragmentationQuestion,
   generateFreeListQuestion,
   generateHeapProgramBreakQuestion,
   generateMallocFreeQuestion,
   generateMemoryLayoutQuestion,
+  generateBestFitQuestion,
+  generateFirstFitQuestion,
+  generateFitStrategyComparisonQuestion,
+  generateRandomAllocationStrategyQuestion,
   generateWorstFitQuestion,
 } from './questions'
 
@@ -64,57 +66,20 @@ export function MemoryManagementUnit() {
           ),
         },
         {
-          id: 'mm-allocation-process',
-          label: 'Allocation Process',
+          id: 'mm-allocation-strategy-drills',
+          label: 'Allocation Strategy Drills',
           render: () => (
-            <NetworkingDrillPractice
-              key="mm-allocation-process"
-              title="Memory Management > Allocation Process"
-              generateQuestion={generateAllocationProcessQuestion}
-            />
-          ),
-        },
-        {
-          id: 'mm-first-fit',
-          label: 'First Fit',
-          render: () => (
-            <NetworkingDrillPractice
-              key="mm-first-fit"
-              title="Memory Management > First Fit"
-              generateQuestion={generateFirstFitQuestion}
-            />
-          ),
-        },
-        {
-          id: 'mm-best-fit',
-          label: 'Best Fit',
-          render: () => (
-            <NetworkingDrillPractice
-              key="mm-best-fit"
-              title="Memory Management > Best Fit"
-              generateQuestion={generateBestFitQuestion}
-            />
-          ),
-        },
-        {
-          id: 'mm-worst-fit',
-          label: 'Worst Fit',
-          render: () => (
-            <NetworkingDrillPractice
-              key="mm-worst-fit"
-              title="Memory Management > Worst Fit"
-              generateQuestion={generateWorstFitQuestion}
-            />
-          ),
-        },
-        {
-          id: 'mm-fit-strategy-comparison',
-          label: 'Fit Strategy Comparison',
-          render: () => (
-            <NetworkingDrillPractice
-              key="mm-fit-strategy-comparison"
-              title="Memory Management > Fit Strategy Comparison"
-              generateQuestion={generateFitStrategyComparisonQuestion}
+            <MemoryStrategyPractice
+              key="mm-allocation-strategy-drills"
+              title="Memory Management > Allocation Strategy Drills"
+              generators={{
+                random: generateRandomAllocationStrategyQuestion,
+                allocationTrace: generateAllocationProcessQuestion,
+                firstFit: generateFirstFitQuestion,
+                bestFit: generateBestFitQuestion,
+                worstFit: generateWorstFitQuestion,
+                strategyCompare: generateFitStrategyComparisonQuestion,
+              }}
             />
           ),
         },
