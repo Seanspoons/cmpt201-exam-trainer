@@ -1,6 +1,6 @@
 # CMPT 201 Exam Trainer
 
-Lightweight React + Vite + TypeScript study app for SFU CMPT 201 exam practice across pre-midterm and post-midterm units.
+Lightweight React + Vite + TypeScript study app for SFU CMPT 201 exam practice across all lecture units.
 
 ## Overview
 

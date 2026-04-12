@@ -85,7 +85,7 @@ function App() {
           />
         </div>
         <h1 className="visually-hidden">CMPT 201 Exam Trainer</h1>
-        <p>Exam-style drills for CMPT 201 pre-midterm and post-midterm units</p>
+        <p>Exam-style drills across all CMPT 201 lecture units</p>
       </header>
       <UnitPicker
         options={UNIT_OPTIONS}
