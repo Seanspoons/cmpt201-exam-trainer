@@ -15,6 +15,7 @@ export function SessionProgressPanel() {
   const [showReview, setShowReview] = useState(false)
 
   const overallAccuracy = calculateAccuracy(state.totalCorrect, state.totalQuestionsAttempted)
+  const isFreshSession = state.totalQuestionsAttempted === 0
 
   const rankedUnits = useMemo(() => {
     const entries: RankedEntry[] = Object.entries(state.byUnit).map(([label, bucket]) => ({
@@ -92,7 +93,7 @@ export function SessionProgressPanel() {
           <div className="session-review-card">
             <h3>Strong Units</h3>
             {strongUnits.length === 0 ? (
-              <p>No attempts yet.</p>
+              <p>{isFreshSession ? 'No attempts yet.' : 'None yet.'}</p>
             ) : (
               <ul>
                 {strongUnits.map((entry) => (
@@ -106,7 +107,7 @@ export function SessionProgressPanel() {
           <div className="session-review-card">
             <h3>Weak Units</h3>
             {weakUnits.length === 0 ? (
-              <p>No attempts yet.</p>
+              <p>{isFreshSession ? 'No attempts yet.' : 'None yet.'}</p>
             ) : (
               <ul>
                 {weakUnits.map((entry) => (
