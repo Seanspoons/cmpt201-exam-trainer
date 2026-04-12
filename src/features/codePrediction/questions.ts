@@ -109,6 +109,52 @@ printf("Done\\n");`,
   },
 ]
 
+const WAIT_QUESTIONS: CodePredictionQuestion[] = [
+  {
+    id: 'wait-zombie',
+    prompt: 'What bug can occur if parent never calls wait()?',
+    code: `if (fork() == 0) {
+  _exit(0);
+}
+sleep(10); // parent does not call wait`,
+    correctAnswers: [
+      'child can become a zombie until parent reaps it',
+      'zombie process can appear because wait is missing',
+      'parent must call wait or waitpid to reap child',
+    ],
+    explanationSteps: [
+      'Step 1: Child exits quickly.',
+      'Step 2: Kernel keeps child exit status until parent collects it.',
+      'Step 3: Without wait/waitpid, child remains a zombie.',
+      'Step 4: Parent should reap child to release process table entry.',
+    ],
+    concepts: ['wait/waitpid reaping', 'zombie lifecycle'],
+  },
+]
+
+const ERRNO_QUESTIONS: CodePredictionQuestion[] = [
+  {
+    id: 'errno-open',
+    prompt: 'After this call fails, what should you inspect for failure reason?',
+    code: `int fd = open("missing-file", O_RDONLY);
+if (fd == -1) {
+  // what gives exact error?
+}`,
+    correctAnswers: [
+      'inspect errno',
+      'check errno for the specific error code',
+      'use perror or strerror(errno)',
+    ],
+    explanationSteps: [
+      'Step 1: open returns -1 on failure.',
+      'Step 2: libc/kernel set errno to indicate the reason (for example ENOENT).',
+      'Step 3: perror or strerror(errno) converts that code into readable output.',
+      'Step 4: Check errno immediately after the failing call.',
+    ],
+    concepts: ['errno semantics', 'system call failure handling'],
+  },
+]
+
 const PIPE_QUESTIONS: CodePredictionQuestion[] = [
   {
     id: 'pipe-write-read',
@@ -203,6 +249,8 @@ sleep(10);`,
 export const CODE_PREDICTION_QUESTIONS: CodePredictionQuestion[] = [
   ...FORK_QUESTIONS,
   ...EXEC_QUESTIONS,
+  ...WAIT_QUESTIONS,
+  ...ERRNO_QUESTIONS,
   ...PIPE_QUESTIONS,
   ...FILE_IO_QUESTIONS,
 ]
@@ -213,6 +261,14 @@ export function generateForkQuestion(): CodePredictionQuestion {
 
 export function generateExecQuestion(): CodePredictionQuestion {
   return randomPick(EXEC_QUESTIONS)
+}
+
+export function generateWaitQuestion(): CodePredictionQuestion {
+  return randomPick(WAIT_QUESTIONS)
+}
+
+export function generateErrnoQuestion(): CodePredictionQuestion {
+  return randomPick(ERRNO_QUESTIONS)
 }
 
 export function generatePipeQuestion(): CodePredictionQuestion {
@@ -227,6 +283,8 @@ export function generateCodePredictionQuestion(): CodePredictionQuestion {
   const generators = [
     generateForkQuestion,
     generateExecQuestion,
+    generateWaitQuestion,
+    generateErrnoQuestion,
     generatePipeQuestion,
     generateFileIoQuestion,
   ]
