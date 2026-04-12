@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useSessionContext } from '../../components/SessionContext'
+import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
 import {
@@ -25,11 +27,12 @@ export function CodePredictionPractice({
   const [question, setQuestion] = useState<CodePredictionQuestion | null>(null)
   const [answer, setAnswer] = useState('')
   const [checked, setChecked] = useState(false)
+  const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
-  const [attempts, setAttempts] = useState(0)
-  const [correct, setCorrect] = useState(0)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
+  const { recordAttempt } = useSessionContext()
+  const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerOnly = () => {
     if (!question) return
@@ -45,20 +48,25 @@ export function CodePredictionPractice({
       setAnswer('')
       setChecked(false)
       setResult(null)
+      setHasCountedAttempt(false)
     })
   }
 
   const checkAnswer = () => {
     if (!question) return
     const grade = gradePredictionAnswer(answer, question)
+    if (!hasCountedAttempt) {
+      recordAttempt({
+        unitLabel,
+        subtopicLabel,
+        isCorrect: grade.status === 'correct',
+      })
+      setHasCountedAttempt(true)
+    }
     setResult({
       status: grade.status,
       missingConceptLabels: grade.missingConceptLabels,
     })
-    setAttempts((value) => value + 1)
-    if (grade.status === 'correct') {
-      setCorrect((value) => value + 1)
-    }
     setChecked(true)
   }
 
@@ -72,9 +80,6 @@ export function CodePredictionPractice({
         onResetAnswer={resetAnswerOnly}
         disableReset={!question}
       />
-      <p className="small-note">
-        Session score: {correct}/{attempts}
-      </p>
 
       <div
         className={`question-stage ${

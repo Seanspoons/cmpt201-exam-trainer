@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useSessionContext } from '../../components/SessionContext'
+import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
 import { normalizeText } from '../../lib/semanticGrading'
@@ -45,11 +47,12 @@ export function SchedulingSimulationPractice({
   const [avgWaitAnswer, setAvgWaitAnswer] = useState('')
   const [timelineAnswer, setTimelineAnswer] = useState<number | null>(null)
   const [checked, setChecked] = useState(false)
+  const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
-  const [attempts, setAttempts] = useState(0)
-  const [correct, setCorrect] = useState(0)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
+  const { recordAttempt } = useSessionContext()
+  const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerInputs = () => {
     setOrderAnswer('')
@@ -76,6 +79,7 @@ export function SchedulingSimulationPractice({
                   : generators.random()
       setQuestion(nextQuestion)
       resetAnswerInputs()
+      setHasCountedAttempt(false)
     })
   }
 
@@ -123,9 +127,15 @@ export function SchedulingSimulationPractice({
       status,
       missingConceptLabels: missing,
     })
+    if (!hasCountedAttempt) {
+      recordAttempt({
+        unitLabel,
+        subtopicLabel,
+        isCorrect: status === 'correct',
+      })
+      setHasCountedAttempt(true)
+    }
     setChecked(true)
-    setAttempts((value) => value + 1)
-    if (status === 'correct') setCorrect((value) => value + 1)
   }
 
   return (
@@ -158,9 +168,6 @@ export function SchedulingSimulationPractice({
         onResetAnswer={resetAnswerOnly}
         disableReset={!question}
       />
-      <p className="small-note">
-        Session score: {correct}/{attempts}
-      </p>
 
       <div
         className={`question-stage ${

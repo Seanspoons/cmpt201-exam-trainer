@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useSessionContext } from '../../components/SessionContext'
+import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
 import type { SchedulingConceptQuestion } from './conceptQuestions'
@@ -23,11 +25,12 @@ export function SchedulingConceptPractice({
   const [mcqAnswer, setMcqAnswer] = useState<number | null>(null)
   const [matchAnswer, setMatchAnswer] = useState<Record<string, string>>({})
   const [checked, setChecked] = useState(false)
+  const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
-  const [attempts, setAttempts] = useState(0)
-  const [correct, setCorrect] = useState(0)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
+  const { recordAttempt } = useSessionContext()
+  const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerInputs = () => {
     setMcqAnswer(null)
@@ -40,6 +43,7 @@ export function SchedulingConceptPractice({
     transition.runQuestionTransition(() => {
       setQuestion(generateQuestion())
       resetAnswerInputs()
+      setHasCountedAttempt(false)
     })
   }
 
@@ -54,10 +58,16 @@ export function SchedulingConceptPractice({
 
     if (question.type === 'mcq') {
       const isCorrect = mcqAnswer === question.correctOption
+      if (!hasCountedAttempt) {
+        recordAttempt({
+          unitLabel,
+          subtopicLabel,
+          isCorrect,
+        })
+        setHasCountedAttempt(true)
+      }
       setResult({ status: isCorrect ? 'correct' : 'incorrect', missingConceptLabels: [] })
       setChecked(true)
-      setAttempts((value) => value + 1)
-      if (isCorrect) setCorrect((value) => value + 1)
       return
     }
 
@@ -71,9 +81,15 @@ export function SchedulingConceptPractice({
           ? 'partial'
           : 'incorrect'
     setResult({ status, missingConceptLabels: missing })
+    if (!hasCountedAttempt) {
+      recordAttempt({
+        unitLabel,
+        subtopicLabel,
+        isCorrect: status === 'correct',
+      })
+      setHasCountedAttempt(true)
+    }
     setChecked(true)
-    setAttempts((value) => value + 1)
-    if (status === 'correct') setCorrect((value) => value + 1)
   }
 
   return (
@@ -86,9 +102,6 @@ export function SchedulingConceptPractice({
         onResetAnswer={resetAnswerOnly}
         disableReset={!question}
       />
-      <p className="small-note">
-        Session score: {correct}/{attempts}
-      </p>
 
       <div
         className={`question-stage ${

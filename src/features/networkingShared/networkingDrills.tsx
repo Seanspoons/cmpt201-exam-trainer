@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useSessionContext } from '../../components/SessionContext'
+import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
 import type { ConceptGroup } from '../../lib/semanticGrading'
@@ -63,11 +65,12 @@ export function NetworkingDrillPractice({
   const [textAnswer, setTextAnswer] = useState('')
   const [matchAnswer, setMatchAnswer] = useState<Record<string, string>>({})
   const [checked, setChecked] = useState(false)
+  const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
-  const [attempts, setAttempts] = useState(0)
-  const [correct, setCorrect] = useState(0)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
+  const { recordAttempt } = useSessionContext()
+  const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerInputs = () => {
     setMcqAnswer(null)
@@ -81,6 +84,7 @@ export function NetworkingDrillPractice({
     transition.runQuestionTransition(() => {
       setQuestion(generateQuestion())
       resetAnswerInputs()
+      setHasCountedAttempt(false)
     })
   }
 
@@ -99,15 +103,19 @@ export function NetworkingDrillPractice({
       isCorrect = mcqAnswer === question.correctOption
     } else if (question.kind === 'text') {
       const grade = gradeByConceptGroups(textAnswer, question.requiredConcepts)
+      if (!hasCountedAttempt) {
+        recordAttempt({
+          unitLabel,
+          subtopicLabel,
+          isCorrect: grade.status === 'correct',
+        })
+        setHasCountedAttempt(true)
+      }
       setResult({
         status: grade.status,
         missingConceptLabels: grade.missingConceptLabels,
       })
       setChecked(true)
-      setAttempts((value) => value + 1)
-      if (grade.status === 'correct') {
-        setCorrect((value) => value + 1)
-      }
       return
     } else {
       isCorrect = question.pairs.every(
@@ -115,15 +123,20 @@ export function NetworkingDrillPractice({
       )
     }
 
+    if (!hasCountedAttempt) {
+      recordAttempt({
+        unitLabel,
+        subtopicLabel,
+        isCorrect,
+      })
+      setHasCountedAttempt(true)
+    }
+
     setResult({
       status: isCorrect ? 'correct' : 'incorrect',
       missingConceptLabels: [],
     })
     setChecked(true)
-    setAttempts((value) => value + 1)
-    if (isCorrect) {
-      setCorrect((value) => value + 1)
-    }
   }
 
   const disabledCheck =
@@ -270,9 +283,6 @@ export function NetworkingDrillPractice({
         onResetAnswer={resetAnswerOnly}
         disableReset={!question}
       />
-      <p className="small-note">
-        Session score: {correct}/{attempts}
-      </p>
 
       <div
         className={`question-stage ${

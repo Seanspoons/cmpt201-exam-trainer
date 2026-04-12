@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useSessionContext } from '../../components/SessionContext'
+import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
 import {
@@ -47,11 +49,12 @@ export function PageReplacementTab() {
   const [faultAnswer, setFaultAnswer] = useState('')
   const [frameAnswer, setFrameAnswer] = useState('')
   const [checked, setChecked] = useState(false)
+  const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
-  const [attempts, setAttempts] = useState(0)
-  const [correct, setCorrect] = useState(0)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
+  const { recordAttempt } = useSessionContext()
+  const { unitLabel, subtopicLabel } = useTopicContext()
 
   const solution = question ? solvePageReplacement(question) : null
 
@@ -70,6 +73,7 @@ export function PageReplacementTab() {
         ),
       )
       resetAnswerInputs()
+      setHasCountedAttempt(false)
     })
   }
 
@@ -108,16 +112,20 @@ export function PageReplacementTab() {
     }
 
     const isCorrect = faultsCorrect && framesCorrect
+    if (!hasCountedAttempt) {
+      recordAttempt({
+        unitLabel,
+        subtopicLabel,
+        isCorrect,
+      })
+      setHasCountedAttempt(true)
+    }
     setResult({
       isCorrect,
       message: isCorrect
         ? 'Your answer matches the expected result.'
         : 'Not correct yet. Review the table and try again.',
     })
-    setAttempts((value) => value + 1)
-    if (isCorrect) {
-      setCorrect((value) => value + 1)
-    }
     setChecked(true)
   }
 
@@ -149,9 +157,6 @@ export function PageReplacementTab() {
         onResetAnswer={resetAnswerOnly}
         disableReset={!question}
       />
-      <p className="small-note">
-        Session score: {correct}/{attempts}
-      </p>
 
       <div
         className={`question-stage ${

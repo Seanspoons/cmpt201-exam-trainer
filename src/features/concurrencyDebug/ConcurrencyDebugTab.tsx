@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
+import { useSessionContext } from '../../components/SessionContext'
+import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
 import { gradeByConceptGroups } from '../../lib/semanticGrading'
@@ -20,11 +22,12 @@ export function ConcurrencyDebugTab() {
   const [mcqAnswer, setMcqAnswer] = useState<number | null>(null)
   const [textAnswer, setTextAnswer] = useState('')
   const [checked, setChecked] = useState(false)
+  const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
-  const [attempts, setAttempts] = useState(0)
-  const [correct, setCorrect] = useState(0)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
+  const { recordAttempt } = useSessionContext()
+  const { unitLabel, subtopicLabel } = useTopicContext()
 
   const resetAnswerInputs = () => {
     setMcqAnswer(null)
@@ -37,6 +40,7 @@ export function ConcurrencyDebugTab() {
     transition.runQuestionTransition(() => {
       setQuestion(randomPick(CONCURRENCY_QUESTIONS))
       resetAnswerInputs()
+      setHasCountedAttempt(false)
     })
   }
 
@@ -52,14 +56,18 @@ export function ConcurrencyDebugTab() {
     if (question.type === 'mcq') {
       if (mcqAnswer === null) return
       const isCorrect = mcqAnswer === question.correctOption
+      if (!hasCountedAttempt) {
+        recordAttempt({
+          unitLabel,
+          subtopicLabel,
+          isCorrect,
+        })
+        setHasCountedAttempt(true)
+      }
       setResult({
         status: isCorrect ? 'correct' : 'incorrect',
         missingConceptLabels: [],
       })
-      setAttempts((value) => value + 1)
-      if (isCorrect) {
-        setCorrect((value) => value + 1)
-      }
       setChecked(true)
       return
     }
@@ -68,14 +76,18 @@ export function ConcurrencyDebugTab() {
       textAnswer,
       question.requiredConcepts,
     )
+    if (!hasCountedAttempt) {
+      recordAttempt({
+        unitLabel,
+        subtopicLabel,
+        isCorrect: grade.status === 'correct',
+      })
+      setHasCountedAttempt(true)
+    }
     setResult({
       status: grade.status,
       missingConceptLabels: grade.missingConceptLabels,
     })
-    setAttempts((value) => value + 1)
-    if (grade.status === 'correct') {
-      setCorrect((value) => value + 1)
-    }
     setChecked(true)
   }
 
@@ -89,9 +101,6 @@ export function ConcurrencyDebugTab() {
         onResetAnswer={resetAnswerOnly}
         disableReset={!question}
       />
-      <p className="small-note">
-        Session score: {correct}/{attempts}
-      </p>
 
       <div
         className={`question-stage ${
