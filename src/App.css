@@ -138,6 +138,26 @@
   background: #f7fafc;
 }
 
+.placeholder-card {
+  border-left: 4px solid #9fb8d9;
+}
+
+.placeholder-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+  color: #244065;
+  font-weight: 600;
+}
+
+.placeholder-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #5a84bd;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -194,6 +214,21 @@ button:hover:not(:disabled) {
   border-color: #88a1be;
 }
 
+.button-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.button-primary:hover:not(:disabled) {
+  background: #18498e;
+  border-color: #18498e;
+}
+
+.button-secondary {
+  background: #f7fafc;
+}
+
 button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -226,6 +261,10 @@ button:disabled {
   border-collapse: collapse;
   margin-top: 0.55rem;
   font-size: 0.9rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
 }
 
 .compact-table th,

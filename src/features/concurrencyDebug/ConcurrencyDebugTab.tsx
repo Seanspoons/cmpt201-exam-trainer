@@ -58,8 +58,12 @@ export function ConcurrencyDebugTab() {
     <div>
       <h2 className="section-title">Concurrency Debug</h2>
       <div className="controls-row">
-        <button onClick={generateQuestion}>Generate Question</button>
-        <button onClick={generateQuestion}>Reset / New Question</button>
+        <button className="button-secondary" onClick={generateQuestion}>
+          Generate Question
+        </button>
+        <button className="button-secondary" onClick={generateQuestion}>
+          Reset / New Question
+        </button>
       </div>
       <p className="small-note">
         Session score: {correct}/{attempts}
@@ -105,6 +109,7 @@ export function ConcurrencyDebugTab() {
 
           <div style={{ marginTop: '0.65rem' }}>
             <button
+              className="button-primary"
               onClick={checkAnswer}
               disabled={
                 question.type === 'mcq' ? mcqAnswer === null : !textAnswer.trim()
@@ -129,24 +134,26 @@ export function ConcurrencyDebugTab() {
                     </strong>
                   </p>
                   <p>{question.explanation}</p>
-                  <table className="compact-table">
-                    <thead>
-                      <tr>
-                        <th>Choice</th>
-                        <th>Why right/wrong</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {question.options.map((option, index) => (
-                        <tr key={option}>
-                          <td>
-                            {String.fromCharCode(65 + index)}. {option}
-                          </td>
-                          <td>{question.wrongReasons[index]}</td>
+                  <div className="table-scroll">
+                    <table className="compact-table">
+                      <thead>
+                        <tr>
+                          <th>Choice</th>
+                          <th>Why right/wrong</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {question.options.map((option, index) => (
+                          <tr key={option}>
+                            <td>
+                              {String.fromCharCode(65 + index)}. {option}
+                            </td>
+                            <td>{question.wrongReasons[index]}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               ) : (
                 <>

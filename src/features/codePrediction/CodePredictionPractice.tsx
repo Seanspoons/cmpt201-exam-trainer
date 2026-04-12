@@ -46,8 +46,12 @@ export function CodePredictionPractice({
     <div>
       <h3 className="section-title">{title}</h3>
       <div className="controls-row">
-        <button onClick={generate}>Generate Question</button>
-        <button onClick={generate}>Reset / New Question</button>
+        <button className="button-secondary" onClick={generate}>
+          Generate Question
+        </button>
+        <button className="button-secondary" onClick={generate}>
+          Reset / New Question
+        </button>
       </div>
       <p className="small-note">
         Session score: {correct}/{attempts}
@@ -69,7 +73,7 @@ export function CodePredictionPractice({
             <p className="small-note">Checking ignores case and extra spaces.</p>
           </div>
           <div style={{ marginTop: '0.65rem' }}>
-            <button onClick={checkAnswer} disabled={!answer.trim()}>
+            <button className="button-primary" onClick={checkAnswer} disabled={!answer.trim()}>
               Check Answer
             </button>
           </div>
@@ -87,20 +91,22 @@ export function CodePredictionPractice({
                   </li>
                 ))}
               </ul>
-              <table className="compact-table">
-                <thead>
-                  <tr>
-                    <th>Step-by-step execution trace</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {question.explanationSteps.map((step) => (
-                    <tr key={step}>
-                      <td>{step}</td>
+              <div className="table-scroll">
+                <table className="compact-table">
+                  <thead>
+                    <tr>
+                      <th>Step-by-step execution trace</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {question.explanationSteps.map((step) => (
+                      <tr key={step}>
+                        <td>{step}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <p className="small-note">Concepts: {question.concepts.join(', ')}</p>
               {question.nonDeterministicNote ? (
                 <p className="small-note">

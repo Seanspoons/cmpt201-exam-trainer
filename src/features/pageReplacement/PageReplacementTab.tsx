@@ -123,8 +123,12 @@ export function PageReplacementTab() {
             <option value="Second Chance">Second Chance</option>
           </select>
         </label>
-        <button onClick={generateQuestion}>Generate Question</button>
-        <button onClick={generateQuestion}>Reset / New Question</button>
+        <button className="button-secondary" onClick={generateQuestion}>
+          Generate Question
+        </button>
+        <button className="button-secondary" onClick={generateQuestion}>
+          Reset / New Question
+        </button>
       </div>
       <p className="small-note">
         Session score: {correct}/{attempts}
@@ -166,7 +170,9 @@ export function PageReplacementTab() {
             </div>
           </div>
 
-          <button onClick={checkAnswer}>Check Answer</button>
+          <button className="button-primary" onClick={checkAnswer}>
+            Check Answer
+          </button>
 
           {checked && result && solution ? (
             <div className="result-box">
@@ -182,36 +188,38 @@ export function PageReplacementTab() {
                 <strong className="mono">{formatFrames(solution.finalFrames)}</strong>
               </p>
 
-              <table className="compact-table">
-                <thead>
-                  <tr>
-                    <th>Step</th>
-                    <th>Page</th>
-                    <th>Frames</th>
-                    <th>Ref Bits</th>
-                    <th>Victim Ptr</th>
-                    <th>Fault?</th>
-                    <th>Evicted</th>
-                    <th>Reason</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {solution.steps.map((step) => (
-                    <tr key={step.step}>
-                      <td>{step.step}</td>
-                      <td>{step.page}</td>
-                      <td className="mono">{formatFrames(step.frames)}</td>
-                      <td className="mono">{formatReferenceBits(step.referenceBits)}</td>
-                      <td className="mono">
-                        {formatVictimPointer(step.victimPointer)}
-                      </td>
-                      <td>{step.pageFault ? 'Yes' : 'No'}</td>
-                      <td>{step.evictedPage ?? '-'}</td>
-                      <td>{step.reason}</td>
+              <div className="table-scroll">
+                <table className="compact-table">
+                  <thead>
+                    <tr>
+                      <th>Step</th>
+                      <th>Page</th>
+                      <th>Frames</th>
+                      <th>Ref Bits</th>
+                      <th>Victim Ptr</th>
+                      <th>Fault?</th>
+                      <th>Evicted</th>
+                      <th>Reason</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {solution.steps.map((step) => (
+                      <tr key={step.step}>
+                        <td>{step.step}</td>
+                        <td>{step.page}</td>
+                        <td className="mono">{formatFrames(step.frames)}</td>
+                        <td className="mono">{formatReferenceBits(step.referenceBits)}</td>
+                        <td className="mono">
+                          {formatVictimPointer(step.victimPointer)}
+                        </td>
+                        <td>{step.pageFault ? 'Yes' : 'No'}</td>
+                        <td>{step.evictedPage ?? '-'}</td>
+                        <td>{step.reason}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ) : null}
         </>

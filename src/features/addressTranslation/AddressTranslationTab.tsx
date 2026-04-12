@@ -56,8 +56,12 @@ export function AddressTranslationTab() {
     <div>
       <h2 className="section-title">Address Translation</h2>
       <div className="controls-row">
-        <button onClick={generateQuestion}>Generate Question</button>
-        <button onClick={generateQuestion}>Reset / New Question</button>
+        <button className="button-secondary" onClick={generateQuestion}>
+          Generate Question
+        </button>
+        <button className="button-secondary" onClick={generateQuestion}>
+          Reset / New Question
+        </button>
       </div>
       <p className="small-note">
         Session score: {correct}/{attempts}
@@ -73,22 +77,24 @@ export function AddressTranslationTab() {
             <p>
               Find page number, offset, and physical address (binary). Page table:
             </p>
-            <table className="compact-table">
-              <thead>
-                <tr>
-                  <th>Page # (bin)</th>
-                  <th>Frame # (bin)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(question.pageTable).map(([page, frame]) => (
-                  <tr key={page}>
-                    <td className="mono">{toBinary(Number(page), question.pageBits)}</td>
-                    <td className="mono">{toBinary(frame, question.frameBits)}</td>
+            <div className="table-scroll">
+              <table className="compact-table">
+                <thead>
+                  <tr>
+                    <th>Page # (bin)</th>
+                    <th>Frame # (bin)</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {Object.entries(question.pageTable).map(([page, frame]) => (
+                    <tr key={page}>
+                      <td className="mono">{toBinary(Number(page), question.pageBits)}</td>
+                      <td className="mono">{toBinary(frame, question.frameBits)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="field-grid">
@@ -118,7 +124,9 @@ export function AddressTranslationTab() {
             </div>
           </div>
 
-          <button onClick={checkAnswer}>Check Answer</button>
+          <button className="button-primary" onClick={checkAnswer}>
+            Check Answer
+          </button>
 
           {checked && result ? (
             <div className="result-box">
