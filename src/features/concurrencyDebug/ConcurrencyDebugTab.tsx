@@ -103,12 +103,16 @@ export function ConcurrencyDebugTab() {
             </div>
           )}
 
-          <button
-            onClick={checkAnswer}
-            disabled={question.type === 'mcq' ? mcqAnswer === null : !textAnswer.trim()}
-          >
-            Check Answer
-          </button>
+          <div style={{ marginTop: '0.65rem' }}>
+            <button
+              onClick={checkAnswer}
+              disabled={
+                question.type === 'mcq' ? mcqAnswer === null : !textAnswer.trim()
+              }
+            >
+              Check Answer
+            </button>
+          </div>
 
           {checked && result ? (
             <div className="result-box">
