@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-  isPredictionAnswerCorrect,
+  gradePredictionAnswer,
   type CodePredictionQuestion,
 } from './questions'
 
@@ -10,7 +10,8 @@ type CodePredictionPracticeProps = {
 }
 
 type CheckResult = {
-  isCorrect: boolean
+  status: 'correct' | 'partial' | 'incorrect'
+  missingConceptLabels: string[]
 }
 
 export function CodePredictionPractice({
@@ -33,10 +34,13 @@ export function CodePredictionPractice({
 
   const checkAnswer = () => {
     if (!question) return
-    const isCorrect = isPredictionAnswerCorrect(answer, question)
-    setResult({ isCorrect })
+    const grade = gradePredictionAnswer(answer, question)
+    setResult({
+      status: grade.status,
+      missingConceptLabels: grade.missingConceptLabels,
+    })
     setAttempts((value) => value + 1)
-    if (isCorrect) {
+    if (grade.status === 'correct') {
       setCorrect((value) => value + 1)
     }
     setChecked(true)
@@ -80,9 +84,27 @@ export function CodePredictionPractice({
 
           {checked && result ? (
             <div className="result-box">
-              <p className={`status ${result.isCorrect ? 'correct' : 'incorrect'}`}>
-                {result.isCorrect ? 'Correct' : 'Incorrect'}
+              <p
+                className={`status ${
+                  result.status === 'correct'
+                    ? 'correct'
+                    : result.status === 'partial'
+                      ? 'correct'
+                      : 'incorrect'
+                }`}
+              >
+                {result.status === 'correct'
+                  ? 'Correct'
+                  : result.status === 'partial'
+                    ? 'Partially Correct'
+                    : 'Incorrect'}
               </p>
+              {result.status === 'partial' ? (
+                <p>
+                  Partially correct — missing key concept:{' '}
+                  <strong>{result.missingConceptLabels.join(', ')}</strong>
+                </p>
+              ) : null}
               <p>Accepted answer(s):</p>
               <ul>
                 {question.correctAnswers.map((value) => (

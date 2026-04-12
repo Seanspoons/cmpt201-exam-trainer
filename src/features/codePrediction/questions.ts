@@ -1,10 +1,13 @@
 import { randomPick } from '../../lib/random'
+import type { ConceptGroup, SemanticGradeResult } from '../../lib/semanticGrading'
+import { gradeByConceptGroups } from '../../lib/semanticGrading'
 
 export type CodePredictionQuestion = {
   id: string
   prompt: string
   code: string
   correctAnswers: string[]
+  requiredConcepts: ConceptGroup[]
   explanationSteps: string[]
   concepts: string[]
   nonDeterministicNote?: string
@@ -18,10 +21,28 @@ export function isPredictionAnswerCorrect(
   userAnswer: string,
   question: CodePredictionQuestion,
 ): boolean {
+  return gradePredictionAnswer(userAnswer, question).status === 'correct'
+}
+
+export function gradePredictionAnswer(
+  userAnswer: string,
+  question: CodePredictionQuestion,
+): SemanticGradeResult {
+  if (question.requiredConcepts.length > 0) {
+    return gradeByConceptGroups(userAnswer, question.requiredConcepts)
+  }
+
   const actual = normalizePredictionAnswer(userAnswer)
-  return question.correctAnswers
+  const matched = question.correctAnswers
     .map((answer) => normalizePredictionAnswer(answer))
     .includes(actual)
+
+  return {
+    status: matched ? 'correct' : 'incorrect',
+    missingConceptLabels: [],
+    matchedCount: matched ? 1 : 0,
+    totalCount: 1,
+  }
 }
 
 const FORK_QUESTIONS: CodePredictionQuestion[] = [
@@ -32,6 +53,10 @@ const FORK_QUESTIONS: CodePredictionQuestion[] = [
 fork();
 printf("X\\n");`,
     correctAnswers: ['3 times', 'prints 3 times', 'x prints 3 times'],
+    requiredConcepts: [
+      { label: 'Total count of 3 prints', keywords: ['3', 'three'] },
+      { label: 'Both parent and child run after fork', keywords: ['both', 'parent', 'child', 'fork creates'] },
+    ],
     explanationSteps: [
       'Step 1: Initial process prints X once.',
       'Step 2: fork() creates one child process.',
@@ -52,6 +77,10 @@ printf("X\\n");`,
       'prints parent and child once each (order may vary)',
       'one parent line and one child line',
       'child and parent both print once',
+    ],
+    requiredConcepts: [
+      { label: 'Both parent and child print', keywords: ['parent', 'child', 'both'] },
+      { label: 'Each prints once', keywords: ['once', 'one'] },
     ],
     explanationSteps: [
       'Step 1: fork() creates parent and child processes.',
@@ -76,6 +105,10 @@ printf("B\\n");`,
       'code after successful exec does not run',
       'exec replaces the process image so B is not printed',
     ],
+    requiredConcepts: [
+      { label: 'exec replaces process image', keywords: ['exec replaces', 'replace process', 'replaces process image'] },
+      { label: 'Post-exec line does not run', keywords: ['does not run', 'not printed', 'b does not print'] },
+    ],
     explanationSteps: [
       'Step 1: Process prints A.',
       'Step 2: execlp succeeds and replaces the current process image.',
@@ -96,6 +129,11 @@ printf("Done\\n");`,
       'child prints hi and parent prints done; "this does not run" is not printed if exec succeeds',
       'hi and done print, but not "this does not run" on successful exec',
       'exec replaces child process so post-exec child printf does not run',
+    ],
+    requiredConcepts: [
+      { label: 'exec in child replaces process', keywords: ['exec replaces', 'child calls exec', 'replaced child'] },
+      { label: 'Post-exec child print does not happen', keywords: ['does not run', 'not printed', 'post-exec'] },
+      { label: 'Hi/Done are expected outputs', keywords: ['hi', 'done'] },
     ],
     explanationSteps: [
       'Step 1: fork() creates child and parent.',
@@ -122,6 +160,10 @@ sleep(10); // parent does not call wait`,
       'zombie process can appear because wait is missing',
       'parent must call wait or waitpid to reap child',
     ],
+    requiredConcepts: [
+      { label: 'Zombie concept', keywords: ['zombie'] },
+      { label: 'Need wait/waitpid to reap', keywords: ['wait', 'waitpid', 'reap', 'collect'] },
+    ],
     explanationSteps: [
       'Step 1: Child exits quickly.',
       'Step 2: Kernel keeps child exit status until parent collects it.',
@@ -144,6 +186,10 @@ if (fd == -1) {
       'inspect errno',
       'check errno for the specific error code',
       'use perror or strerror(errno)',
+    ],
+    requiredConcepts: [
+      { label: 'Inspect errno', keywords: ['errno'] },
+      { label: 'Use perror/strerror or specific code', keywords: ['perror', 'strerror', 'error code', 'enoent'] },
     ],
     explanationSteps: [
       'Step 1: open returns -1 on failure.',
@@ -170,6 +216,10 @@ if (fork() == 0) {
   printf("%s\\n", buf);
 }`,
     correctAnswers: ['ok', 'prints ok'],
+    requiredConcepts: [
+      { label: 'Output is OK', keywords: ['ok'] },
+      { label: 'Parent prints after reading pipe', keywords: ['parent', 'read'] },
+    ],
     explanationSteps: [
       'Step 1: Child closes read end and writes 2 bytes "OK".',
       'Step 2: Parent closes write end and reads exactly 2 bytes.',
@@ -193,6 +243,10 @@ if (fork() == 0) {
       'yes block because all write ends must close for eof',
       'can block forever unless unused write ends are closed',
     ],
+    requiredConcepts: [
+      { label: 'Can block/hang', keywords: ['block', 'hang', 'forever'] },
+      { label: 'EOF needs all write ends closed', keywords: ['eof', 'write end', 'close'] },
+    ],
     explanationSteps: [
       'Step 1: read() loop exits only when read returns 0 (EOF).',
       'Step 2: EOF happens only when every write end of the pipe is closed.',
@@ -213,6 +267,10 @@ printf("%s\\n", buf);`,
       'missing null terminator after read',
       'printf with %s may read past buffer without null terminator',
       'read does not append null terminator so string output is unsafe',
+    ],
+    requiredConcepts: [
+      { label: 'Missing null terminator', keywords: ['null terminator', '\\0', 'null'] },
+      { label: 'printf with %s can read past buffer', keywords: ['printf', '%s', 'past buffer', 'unsafe string'] },
     ],
     explanationSteps: [
       'Step 1: read() writes raw bytes and does not append \\0.',
@@ -235,6 +293,10 @@ sleep(10);`,
       'hello may still be only in user-space stdio buffer until flush or close',
       'data is buffered and may not be written to disk yet',
       'without fflush/fclose the file may appear empty during sleep',
+    ],
+    requiredConcepts: [
+      { label: 'stdio buffering behavior', keywords: ['buffer', 'buffered', 'stdio'] },
+      { label: 'Need fflush/fclose/exit to flush', keywords: ['fflush', 'fclose', 'flush', 'close'] },
     ],
     explanationSteps: [
       'Step 1: fopen creates a stdio stream with buffering.',
