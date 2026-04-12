@@ -1,6 +1,29 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
+import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
 import { AddressTranslationTab } from '../addressTranslation/AddressTranslationTab'
 import { PageReplacementTab } from '../pageReplacement/PageReplacementTab'
+import {
+  generateDemandPagingQuestion,
+  generateLocalityBasicsQuestion,
+  generatePageFaultQuestion,
+  generateSpatialLocalityQuestion,
+  generateSwapThrashingQuestion,
+  generateTemporalLocalityQuestion,
+  generateTemporalSpatialCompareQuestion,
+} from './localityQuestions'
+
+function generateLocalityAndPageFaultsQuestion() {
+  const generators = [
+    generateLocalityBasicsQuestion,
+    generateTemporalLocalityQuestion,
+    generateSpatialLocalityQuestion,
+    generateTemporalSpatialCompareQuestion,
+    generateDemandPagingQuestion,
+    generatePageFaultQuestion,
+    generateSwapThrashingQuestion,
+  ]
+  return generators[Math.floor(Math.random() * generators.length)]()
+}
 
 export function VirtualMemoryUnit() {
   return (
@@ -21,7 +44,13 @@ export function VirtualMemoryUnit() {
         {
           id: 'locality-page-faults',
           label: 'Locality and Page Faults',
-          plannedDrills: ['Classify temporal vs spatial locality', 'Predict fault behavior from access patterns'],
+          render: () => (
+            <NetworkingDrillPractice
+              key="vm-locality-page-faults"
+              title="Virtual Memory > Locality and Page Faults"
+              generateQuestion={generateLocalityAndPageFaultsQuestion}
+            />
+          ),
         },
       ]}
     />
