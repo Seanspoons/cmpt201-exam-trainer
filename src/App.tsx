@@ -24,6 +24,8 @@ import { UNIT_OPTIONS, type UnitId } from './lib/study'
 import './App.css'
 
 function App() {
+  const brandMarkSrc = `${import.meta.env.BASE_URL}cmpt-201-exam-trainer-mark.svg`
+  const brandWordmarkSrc = `${import.meta.env.BASE_URL}cmpt-201-exam-trainer-wordmark.svg`
   const [activeUnit, setActiveUnit] = useState<UnitId>('virtual-memory')
 
   const renderUnit = () => {
@@ -76,7 +78,20 @@ function App() {
   return (
     <main className="app-shell">
       <header className="app-header">
-        <h1>CMPT 201 Exam Trainer</h1>
+        <div className="brand-row">
+          <img
+            src={brandMarkSrc}
+            alt=""
+            aria-hidden="true"
+            className="brand-mark"
+          />
+          <img
+            src={brandWordmarkSrc}
+            alt="CMPT 201 Exam Trainer"
+            className="brand-wordmark"
+          />
+        </div>
+        <h1 className="visually-hidden">CMPT 201 Exam Trainer</h1>
         <p>Exam-style drills for CMPT 201 pre-midterm and post-midterm units</p>
       </header>
       <TabNav
