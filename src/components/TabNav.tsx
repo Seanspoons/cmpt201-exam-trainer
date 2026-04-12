@@ -7,15 +7,20 @@ type TabNavProps<T extends string> = {
   options: Array<TabOption<T>>
   activeTab: T
   onChange: (tab: T) => void
+  variant?: 'unit' | 'subtopic'
 }
 
 export function TabNav<T extends string>({
   options,
   activeTab,
   onChange,
+  variant = 'unit',
 }: TabNavProps<T>) {
   return (
-    <nav aria-label="Study topics">
+    <nav
+      aria-label="Study topics"
+      className={`tab-nav tab-nav--${variant}`}
+    >
       <div className="controls-row" role="tablist">
         {options.map((option) => (
           <button
@@ -23,10 +28,9 @@ export function TabNav<T extends string>({
             role="tab"
             aria-selected={activeTab === option.id}
             onClick={() => onChange(option.id)}
-            style={{
-              fontWeight: activeTab === option.id ? 700 : 400,
-              borderColor: activeTab === option.id ? '#222' : '#777',
-            }}
+            className={`tab-button ${
+              activeTab === option.id ? 'tab-button--active' : ''
+            }`}
           >
             {option.label}
           </button>

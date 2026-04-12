@@ -21,7 +21,12 @@ export function VirtualMemoryUnit() {
   return (
     <div>
       <h2 className="section-title">Virtual Memory</h2>
-      <TabNav options={options} activeTab={subtopic} onChange={setSubtopic} />
+      <TabNav
+        options={options}
+        activeTab={subtopic}
+        onChange={setSubtopic}
+        variant="subtopic"
+      />
       {subtopic === 'page-replacement' ? <PageReplacementTab /> : null}
       {subtopic === 'address-translation' ? <AddressTranslationTab /> : null}
       {subtopic === 'locality-page-faults' ? (

@@ -1,8 +1,8 @@
 :root {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   line-height: 1.45;
-  color: #1f1f1f;
-  background: #f2f4f6;
+  color: #142133;
+  background: #f3f5f8;
 }
 
 * {
@@ -11,4 +11,6 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at 0 0, #f8fbff 0, #f3f5f8 48%, #edf1f7 100%);
 }

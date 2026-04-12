@@ -15,7 +15,12 @@ export function CryptographyUnit() {
   return (
     <div>
       <h2 className="section-title">Cryptography</h2>
-      <TabNav options={SUBTOPIC_OPTIONS} activeTab={subtopic} onChange={setSubtopic} />
+      <TabNav
+        options={SUBTOPIC_OPTIONS}
+        activeTab={subtopic}
+        onChange={setSubtopic}
+        variant="subtopic"
+      />
       {subtopic === 'algorithms' ? (
         <PlaceholderPanel unitLabel="Cryptography" subtopicLabel="Algorithms" />
       ) : null}

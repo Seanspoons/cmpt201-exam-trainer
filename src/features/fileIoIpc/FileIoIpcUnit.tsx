@@ -21,7 +21,12 @@ export function FileIoIpcUnit() {
   return (
     <div>
       <h2 className="section-title">File I/O and IPC</h2>
-      <TabNav options={SUBTOPIC_OPTIONS} activeTab={subtopic} onChange={setSubtopic} />
+      <TabNav
+        options={SUBTOPIC_OPTIONS}
+        activeTab={subtopic}
+        onChange={setSubtopic}
+        variant="subtopic"
+      />
 
       {subtopic === 'file-io' ? (
         <CodePredictionPractice

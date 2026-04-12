@@ -22,7 +22,12 @@ export function SynchronizationUnit() {
   return (
     <div>
       <h2 className="section-title">Synchronization</h2>
-      <TabNav options={SUBTOPIC_OPTIONS} activeTab={subtopic} onChange={setSubtopic} />
+      <TabNav
+        options={SUBTOPIC_OPTIONS}
+        activeTab={subtopic}
+        onChange={setSubtopic}
+        variant="subtopic"
+      />
       {subtopic === 'deadlock' ? <ConcurrencyDebugTab key="sync-deadlock" /> : null}
       {subtopic === 'mutex' ? (
         <PlaceholderPanel unitLabel="Synchronization" subtopicLabel="Mutex" />
