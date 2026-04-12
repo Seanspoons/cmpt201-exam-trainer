@@ -1,3 +1,5 @@
+import type { ConceptGroup } from '../../lib/semanticGrading'
+
 export type ConcurrencyQuestion =
   | {
       id: string
@@ -15,7 +17,7 @@ export type ConcurrencyQuestion =
       type: 'short'
       prompt: string
       code?: string
-      acceptedPatterns: RegExp[]
+      requiredConcepts: ConceptGroup[]
       sampleAnswer: string
       explanation: string
       bugSpot: string
@@ -88,7 +90,11 @@ if (count == 0) {
 }
 item = buffer[--count];
 pthread_mutex_unlock(&m);`,
-    acceptedPatterns: [/while/, /spurious|wake/, /recheck|check.*again/],
+    requiredConcepts: [
+      { label: 'Use while-loop guard', keywords: ['while'] },
+      { label: 'Spurious/competing wakeup behavior', keywords: ['spurious', 'wake', 'another thread'] },
+      { label: 'Re-check condition after wake', keywords: ['recheck', 'check again', 'check condition'] },
+    ],
     sampleAnswer:
       'Use while, not if, around pthread_cond_wait. Wakeups can be spurious or another thread can consume first.',
     explanation:
@@ -101,7 +107,11 @@ pthread_mutex_unlock(&m);`,
     prompt: 'Semaphore used like a mutex is initialized to 2. What bug can happen?',
     code: `sem_t lock;
 sem_init(&lock, 0, 2); // used for critical section`,
-    acceptedPatterns: [/two|multiple/, /critical section|mutual exclusion|mutex/, /race/],
+    requiredConcepts: [
+      { label: 'More than one thread can enter', keywords: ['two', 'multiple', 'more than one'] },
+      { label: 'Mutual exclusion is broken', keywords: ['critical section', 'mutual exclusion', 'mutex'] },
+      { label: 'Race risk', keywords: ['race', 'data race'] },
+    ],
     sampleAnswer:
       'It allows 2 threads into the critical section at once, so mutual exclusion is broken and races can occur.',
     explanation:

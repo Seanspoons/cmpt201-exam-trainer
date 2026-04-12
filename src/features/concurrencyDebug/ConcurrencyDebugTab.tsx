@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { gradeByConceptGroups } from '../../lib/semanticGrading'
 import { randomPick } from '../../lib/random'
 import {
   CONCURRENCY_QUESTIONS,
@@ -6,7 +7,8 @@ import {
 } from './questions'
 
 type CheckResult = {
-  isCorrect: boolean
+  status: 'correct' | 'partial' | 'incorrect'
+  missingConceptLabels: string[]
 }
 
 export function ConcurrencyDebugTab() {
@@ -32,7 +34,10 @@ export function ConcurrencyDebugTab() {
     if (question.type === 'mcq') {
       if (mcqAnswer === null) return
       const isCorrect = mcqAnswer === question.correctOption
-      setResult({ isCorrect })
+      setResult({
+        status: isCorrect ? 'correct' : 'incorrect',
+        missingConceptLabels: [],
+      })
       setAttempts((value) => value + 1)
       if (isCorrect) {
         setCorrect((value) => value + 1)
@@ -41,14 +46,16 @@ export function ConcurrencyDebugTab() {
       return
     }
 
-    const normalized = textAnswer.toLowerCase()
-    const matches = question.acceptedPatterns.filter((pattern) =>
-      pattern.test(normalized),
+    const grade = gradeByConceptGroups(
+      textAnswer,
+      question.requiredConcepts,
     )
-    const isCorrect = matches.length >= 2
-    setResult({ isCorrect })
+    setResult({
+      status: grade.status,
+      missingConceptLabels: grade.missingConceptLabels,
+    })
     setAttempts((value) => value + 1)
-    if (isCorrect) {
+    if (grade.status === 'correct') {
       setCorrect((value) => value + 1)
     }
     setChecked(true)
@@ -121,9 +128,27 @@ export function ConcurrencyDebugTab() {
 
           {checked && result ? (
             <div className="result-box">
-              <p className={`status ${result.isCorrect ? 'correct' : 'incorrect'}`}>
-                {result.isCorrect ? 'Correct' : 'Incorrect'}
+              <p
+                className={`status ${
+                  result.status === 'correct'
+                    ? 'correct'
+                    : result.status === 'partial'
+                      ? 'correct'
+                      : 'incorrect'
+                }`}
+              >
+                {result.status === 'correct'
+                  ? 'Correct'
+                  : result.status === 'partial'
+                    ? 'Partially Correct'
+                    : 'Incorrect'}
               </p>
+              {result.status === 'partial' ? (
+                <p>
+                  Partially correct — missing key concept:{' '}
+                  <strong>{result.missingConceptLabels.join(', ')}</strong>
+                </p>
+              ) : null}
               {question.type === 'mcq' ? (
                 <>
                   <p>
