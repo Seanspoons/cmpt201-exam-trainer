@@ -35,9 +35,9 @@ export type UnitOption = {
 
 export const UNIT_OPTIONS: UnitOption[] = [
   { id: 'tour-computer-systems', label: 'Tour of Computer Systems', implemented: false },
-  { id: 'sleep', label: 'sleep()', implemented: false },
-  { id: 'fork-exec', label: 'fork() and exec()', implemented: true, questionCount: 4 },
-  { id: 'wait-errno', label: 'wait() and errno', implemented: true, questionCount: 2 },
+  { id: 'sleep', label: 'sleep()', implemented: true, questionCount: 7 },
+  { id: 'fork-exec', label: 'fork() and exec()', implemented: true, questionCount: 16 },
+  { id: 'wait-errno', label: 'wait() and errno', implemented: true, questionCount: 12 },
   { id: 'signals', label: 'Signals', implemented: true, questionCount: 13 },
   { id: 'scheduling', label: 'Scheduling', implemented: true, questionCount: 'infinity' },
   { id: 'memory-management', label: 'Memory Management', implemented: true, questionCount: 23 },
