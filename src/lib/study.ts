@@ -49,7 +49,7 @@ export const UNIT_OPTIONS: UnitOption[] = [
   },
   { id: 'threads', label: 'Threads', implemented: true, questionCount: 12 },
   { id: 'sync-mutex', label: 'Synchronization: Mutex', implemented: true, questionCount: 19 },
-  { id: 'sync-patterns', label: 'Synchronization: Patterns', implemented: true, questionCount: 4 },
+  { id: 'sync-patterns', label: 'Synchronization: Patterns', implemented: true, questionCount: 20 },
   { id: 'file-io', label: 'File I/O: Calls', implemented: true, questionCount: 12 },
   { id: 'filesystems', label: 'File I/O: File Systems', implemented: true, questionCount: 12 },
   { id: 'networking-sockets', label: 'Networking: Sockets', implemented: true, questionCount: 10 },
