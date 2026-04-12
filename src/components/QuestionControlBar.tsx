@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { FiRefreshCw, FiRotateCcw } from 'react-icons/fi'
+import { useAllTopicsContext } from './AllTopicsContext'
 
 type QuestionControlBarProps = {
   hasQuestion: boolean
@@ -15,11 +17,24 @@ export function QuestionControlBar({
   onResetAnswer,
   disableReset = false,
 }: QuestionControlBarProps) {
+  const { isAllTopicsMode, advanceTopic } = useAllTopicsContext()
+
+  useEffect(() => {
+    if (!isAllTopicsMode || hasQuestion || isTransitioning) return
+    onNewQuestion()
+  }, [hasQuestion, isAllTopicsMode, isTransitioning, onNewQuestion])
+
   return (
     <div className="question-control-bar">
       <button
         className="button-primary question-action-button"
-        onClick={onNewQuestion}
+        onClick={() => {
+          if (isAllTopicsMode) {
+            advanceTopic()
+            return
+          }
+          onNewQuestion()
+        }}
         disabled={isTransitioning}
       >
         <FiRefreshCw aria-hidden="true" />

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { AllTopicsProvider } from './AllTopicsContext'
 import { TabNav } from './TabNav'
 import { PlaceholderPanel } from './PlaceholderPanel'
 import type { SubtopicId } from '../lib/study'
@@ -64,26 +65,26 @@ export function UnitScaffold({
         <div>
           <div className="all-topics-bar">
             <p className="all-topics-note">
-              All Topics mode cycles through all implemented subtopics in this unit.
+              All Topics mode rotates automatically when you press New Question.
             </p>
-            <button
-              className="button-secondary"
-              onClick={() =>
-                setAllTopicsIndex((index) =>
-                  renderedSubtopics.length === 0
-                    ? 0
-                    : (index + 1) % renderedSubtopics.length,
-                )
-              }
-            >
-              Next Topic
-            </button>
           </div>
           <p className="small-note">
             Current topic: <strong>{activeAllTopic?.label ?? 'N/A'}</strong>
           </p>
           <div key={activeAllTopic?.id}>
-            {activeAllTopic?.render ? activeAllTopic.render() : null}
+            <AllTopicsProvider
+              value={{
+                isAllTopicsMode: true,
+                advanceTopic: () =>
+                  setAllTopicsIndex((index) =>
+                    renderedSubtopics.length === 0
+                      ? 0
+                      : (index + 1) % renderedSubtopics.length,
+                  ),
+              }}
+            >
+              {activeAllTopic?.render ? activeAllTopic.render() : null}
+            </AllTopicsProvider>
           </div>
         </div>
       ) : selected?.render ? (
