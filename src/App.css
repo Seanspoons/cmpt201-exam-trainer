@@ -44,19 +44,12 @@
 .brand-row {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-}
-
-.brand-mark {
-  width: 36px;
-  height: 36px;
-  flex: 0 0 auto;
 }
 
 .brand-wordmark {
-  height: 26px;
+  height: 34px;
   width: auto;
-  max-width: min(100%, 520px);
+  max-width: min(100%, 620px);
 }
 
 .visually-hidden {
@@ -362,13 +355,8 @@ button:disabled {
     font-size: 0.85rem;
   }
 
-  .brand-mark {
-    width: 30px;
-    height: 30px;
-  }
-
   .brand-wordmark {
-    height: 22px;
+    height: 28px;
   }
 
   .compact-table {

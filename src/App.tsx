@@ -24,7 +24,6 @@ import { UNIT_OPTIONS, type UnitId } from './lib/study'
 import './App.css'
 
 function App() {
-  const brandMarkSrc = `${import.meta.env.BASE_URL}cmpt-201-exam-trainer-mark.svg`
   const brandWordmarkSrc = `${import.meta.env.BASE_URL}cmpt-201-exam-trainer-wordmark.svg`
   const [activeUnit, setActiveUnit] = useState<UnitId>('virtual-memory')
 
@@ -79,12 +78,6 @@ function App() {
     <main className="app-shell">
       <header className="app-header">
         <div className="brand-row">
-          <img
-            src={brandMarkSrc}
-            alt=""
-            aria-hidden="true"
-            className="brand-mark"
-          />
           <img
             src={brandWordmarkSrc}
             alt="CMPT 201 Exam Trainer"
