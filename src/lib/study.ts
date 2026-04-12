@@ -51,7 +51,7 @@ export const UNIT_OPTIONS: UnitOption[] = [
   { id: 'sync-mutex', label: 'Synchronization: Mutex', implemented: false },
   { id: 'sync-patterns', label: 'Synchronization: Patterns', implemented: true, questionCount: 4 },
   { id: 'file-io', label: 'File I/O: Calls', implemented: true, questionCount: 12 },
-  { id: 'filesystems', label: 'File I/O: File Systems', implemented: false },
+  { id: 'filesystems', label: 'File I/O: File Systems', implemented: true, questionCount: 12 },
   { id: 'networking-sockets', label: 'Networking: Sockets', implemented: true, questionCount: 10 },
   { id: 'networking-af-inet', label: 'Networking: AF_INET', implemented: true, questionCount: 10 },
   {
