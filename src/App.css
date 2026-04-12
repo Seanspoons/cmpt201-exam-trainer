@@ -123,6 +123,16 @@
   padding: 0.08rem 0.45rem;
 }
 
+.unit-count-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #1e4b87;
+  background: #e9f2ff;
+  border: 1px solid #c6daf8;
+  border-radius: 999px;
+  padding: 0.08rem 0.45rem;
+}
+
 .unit-drawer-item--active {
   background: var(--primary-soft);
   border-color: #8eb2e6;

@@ -130,7 +130,13 @@ function App() {
             >
               <span className="unit-drawer-label">
                 {unit.label}
-                {unit.implemented ? null : (
+                {unit.implemented ? (
+                  <span className="unit-count-badge">
+                    {unit.questionCount === 'infinity'
+                      ? '∞'
+                      : `${unit.questionCount ?? 0}Q`}
+                  </span>
+                ) : (
                   <span className="unit-status-badge">Coming Soon</span>
                 )}
               </span>
