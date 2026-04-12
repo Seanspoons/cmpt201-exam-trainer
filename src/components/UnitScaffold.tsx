@@ -68,9 +68,6 @@ export function UnitScaffold({
               All Topics mode rotates automatically when you press New Question.
             </p>
           </div>
-          <p className="small-note">
-            Current topic: <strong>{activeAllTopic?.label ?? 'N/A'}</strong>
-          </p>
           <div key={activeAllTopic?.id}>
             <AllTopicsProvider
               value={{
