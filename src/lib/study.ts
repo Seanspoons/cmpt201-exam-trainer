@@ -39,7 +39,7 @@ export const UNIT_OPTIONS: UnitOption[] = [
   { id: 'fork-exec', label: 'fork() and exec()', implemented: true, questionCount: 4 },
   { id: 'wait-errno', label: 'wait() and errno', implemented: true, questionCount: 2 },
   { id: 'signals', label: 'Signals', implemented: false },
-  { id: 'scheduling', label: 'Scheduling', implemented: false },
+  { id: 'scheduling', label: 'Scheduling', implemented: true, questionCount: 'infinity' },
   { id: 'memory-management', label: 'Memory Management', implemented: false },
   {
     id: 'virtual-memory',
