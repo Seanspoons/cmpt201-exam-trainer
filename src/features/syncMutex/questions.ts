@@ -144,6 +144,26 @@ const CRITICAL_SECTION_AND_ATOMICITY_QUESTIONS: NetworkingQuestion[] = [
 
 const LOCK_BEHAVIOR_AND_API_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'mutex-fill-blank-lock-call',
+    kind: 'text',
+    prompt: 'Fill in the blank to acquire the mutex in this function.',
+    code: `void update(void) {
+  _____(&m);
+  shared++;
+  pthread_mutex_unlock(&m);
+}`,
+    requiredConcepts: [
+      { label: 'pthread_mutex_lock', keywords: ['pthread_mutex_lock'] },
+    ],
+    answerDisplay: '`pthread_mutex_lock`',
+    explanationSteps: [
+      'Critical section must be entered by acquiring the lock first.',
+      'Lock/unlock pairing prevents concurrent shared updates.',
+      'Missing lock causes race on `shared`.',
+    ],
+    conceptSummary: 'Code completion: protect shared update with pthread_mutex_lock.',
+  },
+  {
     id: 'mutex-api-which-acquires',
     kind: 'mcq',
     prompt: 'Which API call acquires a pthread mutex?',
@@ -318,6 +338,31 @@ const DEADLOCK_QUESTIONS: NetworkingQuestion[] = [
 
 const DEADLOCK_PREVENTION_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'mutex-bug-opposite-lock-order',
+    kind: 'mcq',
+    prompt: 'What is the bug risk in this pair of thread routines?',
+    code: `// T1
+pthread_mutex_lock(&a);
+pthread_mutex_lock(&b);
+
+// T2
+pthread_mutex_lock(&b);
+pthread_mutex_lock(&a);`,
+    options: [
+      'Potential deadlock due to opposite lock acquisition order',
+      'Guaranteed livelock only',
+      'No issue because mutexes are recursive by default',
+      'Only race condition, no deadlock possibility',
+    ],
+    correctOption: 0,
+    explanationSteps: [
+      'Threads can each hold one lock and wait on the other.',
+      'That creates circular wait possibility.',
+      'Fix by enforcing consistent global lock order.',
+    ],
+    conceptSummary: 'Bug detection: opposite lock order can deadlock.',
+  },
+  {
     id: 'mutex-prevention-lock-order',
     kind: 'mcq',
     prompt: 'How does acquiring multiple locks in a consistent global order help?',
@@ -429,5 +474,4 @@ export function generateLivelockQuestion(): NetworkingQuestion {
   return randomPick(LIVELOCK_QUESTIONS)
 }
 
-export const SYNC_MUTEX_QUESTION_COUNT = 19
-
+export const SYNC_MUTEX_QUESTION_COUNT = 21

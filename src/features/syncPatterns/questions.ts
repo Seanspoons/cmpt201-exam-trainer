@@ -104,6 +104,27 @@ const CONDITION_VARIABLE_QUESTIONS: NetworkingQuestion[] = [
 
 const CONDITION_USAGE_RULES_QUESTIONS: NetworkingQuestion[] = [
   {
+    id: 'sp-fill-blank-cond-while',
+    kind: 'text',
+    prompt: 'Fill in the blank with the correct control keyword for condition wait usage.',
+    code: `pthread_mutex_lock(&m);
+_____ (avail == 0) {
+  pthread_cond_wait(&cond, &m);
+}
+consume();
+pthread_mutex_unlock(&m);`,
+    requiredConcepts: [
+      { label: 'while', keywords: ['while'] },
+    ],
+    answerDisplay: '`while`',
+    explanationSteps: [
+      'Predicate must be rechecked after wakeup.',
+      'if can fail when another thread changes state first.',
+      'while-loop preserves correctness.',
+    ],
+    conceptSummary: 'Code completion: cond_wait pattern uses while, not if.',
+  },
+  {
     id: 'sp-cond-while-not-if',
     kind: 'text',
     prompt: 'Why should condition waiting use `while` instead of `if` around pthread_cond_wait()?',
@@ -160,6 +181,27 @@ const CONDITION_USAGE_RULES_QUESTIONS: NetworkingQuestion[] = [
 ]
 
 const SEMAPHORE_QUESTIONS: NetworkingQuestion[] = [
+  {
+    id: 'sp-fill-blank-sem-wait-post',
+    kind: 'text',
+    prompt: 'Complete producer steps for a bounded buffer.',
+    code: `_____(&empty);
+pthread_mutex_lock(&m);
+insert_item();
+pthread_mutex_unlock(&m);
+_____(&full);`,
+    requiredConcepts: [
+      { label: 'sem_wait on empty', keywords: ['sem_wait', 'wait'] },
+      { label: 'sem_post on full', keywords: ['sem_post', 'post'] },
+    ],
+    answerDisplay: 'First blank: `sem_wait`; second blank: `sem_post`',
+    explanationSteps: [
+      'Producer must wait for an available empty slot before inserting.',
+      'After insertion, producer signals that one more filled slot exists.',
+      'Mutex protects structure updates between these semaphore operations.',
+    ],
+    conceptSummary: 'Code completion: bounded-buffer producer uses wait(empty) then post(full).',
+  },
   {
     id: 'sp-semaphore-definition',
     kind: 'text',
@@ -392,5 +434,4 @@ export function generateBoundedBufferQuestion(): NetworkingQuestion {
   return randomPick(BOUNDED_BUFFER_QUESTIONS)
 }
 
-export const SYNC_PATTERNS_QUESTION_COUNT = 20
-
+export const SYNC_PATTERNS_QUESTION_COUNT = 22
