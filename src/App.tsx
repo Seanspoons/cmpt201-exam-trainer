@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { UnitPicker } from './components/UnitPicker'
 import { CryptoAlgorithmsUnit } from './features/cryptoAlgorithms/CryptoAlgorithmsUnit'
 import { CryptoApplicationsUnit } from './features/cryptoApplications/CryptoApplicationsUnit'
 import { FileIoUnit } from './features/fileIo/FileIoUnit'
@@ -26,6 +25,12 @@ import './App.css'
 function App() {
   const brandWordmarkSrc = `${import.meta.env.BASE_URL}cmpt-201-exam-trainer-wordmark.svg`
   const [activeUnit, setActiveUnit] = useState<UnitId>('virtual-memory')
+  const [isUnitMenuOpen, setIsUnitMenuOpen] = useState(false)
+
+  const selectUnit = (unitId: UnitId) => {
+    setActiveUnit(unitId)
+    setIsUnitMenuOpen(false)
+  }
 
   const renderUnit = () => {
     switch (activeUnit) {
@@ -83,15 +88,53 @@ function App() {
             alt="CMPT 201 Exam Trainer"
             className="brand-wordmark"
           />
+          <button
+            className="button-secondary unit-menu-toggle"
+            onClick={() => setIsUnitMenuOpen((value) => !value)}
+            aria-expanded={isUnitMenuOpen}
+            aria-controls="unit-drawer"
+          >
+            {isUnitMenuOpen ? 'Close Units' : 'Select Unit'}
+          </button>
         </div>
         <h1 className="visually-hidden">CMPT 201 Exam Trainer</h1>
         <p>Exam-style drills across all CMPT 201 lecture units</p>
       </header>
-      <UnitPicker
-        options={UNIT_OPTIONS}
-        value={activeUnit}
-        onChange={setActiveUnit}
-      />
+      <aside
+        id="unit-drawer"
+        className={`unit-drawer ${isUnitMenuOpen ? 'unit-drawer--open' : ''}`}
+        aria-hidden={!isUnitMenuOpen}
+      >
+        <div className="unit-drawer-head">
+          <strong>Course Units</strong>
+          <button
+            className="button-secondary"
+            onClick={() => setIsUnitMenuOpen(false)}
+          >
+            Close
+          </button>
+        </div>
+        <div className="unit-drawer-list">
+          {UNIT_OPTIONS.map((unit) => (
+            <button
+              key={unit.id}
+              className={`unit-drawer-item ${
+                activeUnit === unit.id ? 'unit-drawer-item--active' : ''
+              }`}
+              onClick={() => selectUnit(unit.id)}
+            >
+              {unit.label}
+            </button>
+          ))}
+        </div>
+      </aside>
+      {isUnitMenuOpen ? (
+        <button
+          className="unit-overlay"
+          aria-label="Close unit menu"
+          onClick={() => setIsUnitMenuOpen(false)}
+        />
+      ) : null}
       <section className="tab-panel">{renderUnit()}</section>
     </main>
   )
