@@ -43,6 +43,9 @@
 
 .unit-menu-toggle {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .unit-drawer {
@@ -73,6 +76,19 @@
   border-bottom: 1px solid var(--border);
 }
 
+.unit-drawer-head strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text);
+}
+
+.unit-drawer-head button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 .unit-drawer-list {
   padding: 0.6rem;
   overflow-y: auto;
@@ -81,6 +97,10 @@
 }
 
 .unit-drawer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
   text-align: left;
   border-radius: 8px;
   background: #fff;
@@ -96,10 +116,8 @@
 .unit-overlay {
   position: fixed;
   inset: 0;
-  border: none;
   background: rgba(12, 22, 34, 0.3);
   z-index: 20;
-  padding: 0;
 }
 
 .brand-row {

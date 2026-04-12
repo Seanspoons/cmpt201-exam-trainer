@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FiBookOpen, FiChevronRight, FiMenu, FiX } from 'react-icons/fi'
 import { CryptoAlgorithmsUnit } from './features/cryptoAlgorithms/CryptoAlgorithmsUnit'
 import { CryptoApplicationsUnit } from './features/cryptoApplications/CryptoApplicationsUnit'
 import { FileIoUnit } from './features/fileIo/FileIoUnit'
@@ -94,7 +95,8 @@ function App() {
             aria-expanded={isUnitMenuOpen}
             aria-controls="unit-drawer"
           >
-            {isUnitMenuOpen ? 'Close Units' : 'Select Unit'}
+            {isUnitMenuOpen ? <FiX aria-hidden="true" /> : <FiMenu aria-hidden="true" />}
+            <span>{isUnitMenuOpen ? 'Close Units' : 'Select Unit'}</span>
           </button>
         </div>
         <h1 className="visually-hidden">CMPT 201 Exam Trainer</h1>
@@ -106,12 +108,15 @@ function App() {
         aria-hidden={!isUnitMenuOpen}
       >
         <div className="unit-drawer-head">
-          <strong>Course Units</strong>
+          <strong>
+            <FiBookOpen aria-hidden="true" /> Course Units
+          </strong>
           <button
             className="button-secondary"
             onClick={() => setIsUnitMenuOpen(false)}
           >
-            Close
+            <FiX aria-hidden="true" />
+            <span>Close</span>
           </button>
         </div>
         <div className="unit-drawer-list">
@@ -123,15 +128,16 @@ function App() {
               }`}
               onClick={() => selectUnit(unit.id)}
             >
-              {unit.label}
+              <span>{unit.label}</span>
+              <FiChevronRight aria-hidden="true" />
             </button>
           ))}
         </div>
       </aside>
       {isUnitMenuOpen ? (
-        <button
+        <div
           className="unit-overlay"
-          aria-label="Close unit menu"
+          aria-hidden="true"
           onClick={() => setIsUnitMenuOpen(false)}
         />
       ) : null}
