@@ -1,9 +1,16 @@
 type PlaceholderPanelProps = {
   unitLabel: string
   subtopicLabel: string
+  plannedDrills?: string[]
+  message?: string
 }
 
-export function PlaceholderPanel({ unitLabel, subtopicLabel }: PlaceholderPanelProps) {
+export function PlaceholderPanel({
+  unitLabel,
+  subtopicLabel,
+  plannedDrills,
+  message,
+}: PlaceholderPanelProps) {
   return (
     <div>
       <h3 className="section-title">
@@ -14,7 +21,17 @@ export function PlaceholderPanel({ unitLabel, subtopicLabel }: PlaceholderPanelP
           <span className="placeholder-dot" aria-hidden="true"></span>
           Scaffolded Subtopic
         </p>
-        <p>This subtopic is scaffolded and ready for question templates.</p>
+        <p>
+          {message ??
+            'This subtopic is coming soon. Planned drills will include exam-style tracing, output prediction, and concept checks.'}
+        </p>
+        {plannedDrills && plannedDrills.length > 0 ? (
+          <ul>
+            {plannedDrills.map((drill) => (
+              <li key={drill}>{drill}</li>
+            ))}
+          </ul>
+        ) : null}
         <p className="small-note">
           Planned next: add exam-style question generators and step-by-step solutions
           for this subtopic.
