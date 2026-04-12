@@ -6,10 +6,9 @@ const ACCEPT_CLIENT_SOCKET_QUESTIONS: NetworkingQuestion[] = [
     id: 'accept-return-drill',
     kind: 'text',
     prompt: 'What does accept() return on a TCP server?',
-    acceptedAnswers: [
-      'a new socket file descriptor for that client connection',
-      'a new connected socket for the accepted client',
-      'a new file descriptor representing the client socket',
+    requiredConcepts: [
+      { label: 'Returns new socket/file descriptor', keywords: ['new socket', 'file descriptor', 'fd'] },
+      { label: 'For accepted client connection', keywords: ['client connection', 'accepted client', 'per-client'] },
     ],
     answerDisplay: 'A new connected socket/file descriptor for that client.',
     explanationSteps: [
@@ -64,10 +63,9 @@ const THREAD_PER_CONNECTION_QUESTIONS: NetworkingQuestion[] = [
     id: 'thread-overhead-why',
     kind: 'text',
     prompt: 'Why can thread-per-client servers become expensive at large scale?',
-    acceptedAnswers: [
-      'many threads increase memory and scheduling overhead',
-      'each client thread adds stack memory and context switching cost',
-      'too many threads consume kernel resources and cpu time for scheduling',
+    requiredConcepts: [
+      { label: 'Resource overhead from many threads', keywords: ['many threads', 'too many threads', 'thread per client'] },
+      { label: 'Memory/scheduling cost', keywords: ['memory', 'stack', 'scheduling', 'context switching', 'kernel resources'] },
     ],
     answerDisplay:
       'Many client threads add stack memory usage, scheduler overhead, and context-switch cost.',
@@ -104,10 +102,9 @@ const NON_BLOCKING_LOOP_QUESTIONS: NetworkingQuestion[] = [
     id: 'busy-wait-explain',
     kind: 'text',
     prompt: 'Why does busy polling in a non-blocking loop waste CPU?',
-    acceptedAnswers: [
-      'the loop repeatedly checks sockets even when no data is ready',
-      'it keeps running instead of sleeping and waiting for readiness events',
-      'constant polling does work without useful progress',
+    requiredConcepts: [
+      { label: 'Repeated checking/polling', keywords: ['repeatedly checks', 'polling', 'busy loop', 'spins'] },
+      { label: 'No readiness/no progress', keywords: ['no data ready', 'no events ready', 'without progress', 'wastes cpu'] },
     ],
     answerDisplay:
       'It repeatedly checks sockets even when no events are ready, doing work without progress.',
@@ -139,10 +136,9 @@ const EPOLL_QUESTIONS: NetworkingQuestion[] = [
     id: 'epoll-wait-purpose',
     kind: 'text',
     prompt: 'What is epoll_wait() doing in a multi-client server?',
-    acceptedAnswers: [
-      'it waits for readiness events on monitored file descriptors',
-      'it blocks until registered sockets become ready for io',
-      'it returns sockets that are ready after kernel event notification',
+    requiredConcepts: [
+      { label: 'Waits for readiness events', keywords: ['waits', 'blocks', 'readiness events', 'ready'] },
+      { label: 'On monitored descriptors/sockets', keywords: ['monitored descriptors', 'sockets', 'registered'] },
     ],
     answerDisplay:
       'It blocks until monitored descriptors are ready, then returns ready events.',

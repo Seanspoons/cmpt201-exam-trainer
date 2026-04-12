@@ -56,7 +56,10 @@ const IPV4_HANDLING_QUESTIONS: NetworkingQuestion[] = [
     id: 'inet-ntop-drill',
     kind: 'text',
     prompt: 'Which function converts binary IPv4 address data back into dotted-quad text?',
-    acceptedAnswers: ['inet_ntop', 'inet_ntop()'],
+    requiredConcepts: [
+      { label: 'Use inet_ntop', keywords: ['inet_ntop'] },
+      { label: 'Network binary to text direction', keywords: ['binary to text', 'dotted', 'presentation'] },
+    ],
     answerDisplay: 'inet_ntop()',
     explanationSteps: [
       'Binary IPv4 bytes are not directly human-readable.',
@@ -97,10 +100,9 @@ const PORTS_SPECIAL_QUESTIONS: NetworkingQuestion[] = [
     id: 'loopback-purpose',
     kind: 'text',
     prompt: 'What is the purpose of 127.0.0.1?',
-    acceptedAnswers: [
-      'local communication on the same machine',
-      'loopback for traffic that stays on the same host',
-      'communication within the same machine only',
+    requiredConcepts: [
+      { label: 'Loopback/local host concept', keywords: ['loopback', 'local host', 'same machine'] },
+      { label: 'Traffic stays local', keywords: ['within the same machine', 'stays local', 'not external'] },
     ],
     answerDisplay: 'Loopback/local-only communication on the same machine.',
     explanationSteps: [
@@ -130,10 +132,9 @@ const NETWORK_ORDER_QUESTIONS: NetworkingQuestion[] = [
     id: 'byte-order-why',
     kind: 'text',
     prompt: 'Why is network byte order needed?',
-    acceptedAnswers: [
-      'to ensure hosts with different endianness interpret multibyte values consistently',
-      'so different machine architectures agree on byte layout',
-      'to standardize multibyte integer representation across networks',
+    requiredConcepts: [
+      { label: 'Different endianness across hosts', keywords: ['endianness', 'different host order', 'architectures'] },
+      { label: 'Consistent interpretation/standardization', keywords: ['consistent', 'standardize', 'agree'] },
     ],
     answerDisplay:
       'It standardizes multibyte values so hosts with different endianness interpret them consistently.',
@@ -170,10 +171,9 @@ const SEND_RECV_QUESTIONS: NetworkingQuestion[] = [
     kind: 'text',
     prompt:
       'When binding a server to port 8000 in sockaddr_in, what conversion is needed?',
-    acceptedAnswers: [
-      'store htons(8000) in sin_port',
-      'use htons on 8000 before assigning sin_port',
-      'convert 8000 with htons before putting it in sin_port',
+    requiredConcepts: [
+      { label: 'Use htons()', keywords: ['htons'] },
+      { label: 'Assign converted value to sin_port', keywords: ['sin_port', 'store', 'assign'] },
     ],
     answerDisplay: 'Use htons(8000) and store that in sin_port.',
     explanationSteps: [

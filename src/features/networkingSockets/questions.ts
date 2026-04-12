@@ -43,10 +43,9 @@ const STACK_BASICS_QUESTIONS: NetworkingQuestion[] = [
     id: 'listen-purpose',
     kind: 'text',
     prompt: 'Why is listen() needed on a TCP server after bind()?',
-    acceptedAnswers: [
-      'it marks the socket as passive so it can accept incoming tcp connections',
-      'to allow accept() by putting the socket in listening mode',
-      'it enables the server to queue incoming connection requests',
+    requiredConcepts: [
+      { label: 'Passive/listening state', keywords: ['passive', 'listening mode', 'listen'] },
+      { label: 'accept() connection handling', keywords: ['accept', 'incoming connection', 'queue'] },
     ],
     answerDisplay:
       'listen() marks the socket as a passive TCP listening socket so accept() can return client connections.',
@@ -171,10 +170,9 @@ const ROLE_IDENTIFICATION_QUESTIONS: NetworkingQuestion[] = [
     id: 'accept-return',
     kind: 'text',
     prompt: 'What does accept() return on a TCP server?',
-    acceptedAnswers: [
-      'a new connected socket file descriptor for that client',
-      'a new connected socket for the accepted client',
-      'a new file descriptor representing the client connection',
+    requiredConcepts: [
+      { label: 'Returns a new socket/file descriptor', keywords: ['new socket', 'file descriptor', 'fd'] },
+      { label: 'Represents specific client connection', keywords: ['client connection', 'accepted client', 'per-client'] },
     ],
     answerDisplay: 'A new connected socket file descriptor for that client connection.',
     explanationSteps: [

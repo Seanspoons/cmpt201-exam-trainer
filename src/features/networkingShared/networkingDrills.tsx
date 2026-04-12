@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import type { ConceptGroup } from '../../lib/semanticGrading'
+import { gradeByConceptGroups } from '../../lib/semanticGrading'
 
 type NetworkingBaseQuestion = {
   id: string
@@ -20,7 +22,7 @@ export type NetworkingMcqQuestion = NetworkingBaseQuestion & {
 
 export type NetworkingTextQuestion = NetworkingBaseQuestion & {
   kind: 'text'
-  acceptedAnswers: string[]
+  requiredConcepts: ConceptGroup[]
   answerDisplay: string
 }
 
@@ -40,7 +42,8 @@ type NetworkingDrillPracticeProps = {
 }
 
 type CheckResult = {
-  isCorrect: boolean
+  status: 'correct' | 'partial' | 'incorrect'
+  missingConceptLabels: string[]
 }
 
 function normalizeAnswer(value: string): string {
@@ -77,17 +80,27 @@ export function NetworkingDrillPractice({
     if (question.kind === 'mcq') {
       isCorrect = mcqAnswer === question.correctOption
     } else if (question.kind === 'text') {
-      const normalizedUser = normalizeAnswer(textAnswer)
-      isCorrect = question.acceptedAnswers
-        .map((answer) => normalizeAnswer(answer))
-        .includes(normalizedUser)
+      const grade = gradeByConceptGroups(textAnswer, question.requiredConcepts)
+      setResult({
+        status: grade.status,
+        missingConceptLabels: grade.missingConceptLabels,
+      })
+      setChecked(true)
+      setAttempts((value) => value + 1)
+      if (grade.status === 'correct') {
+        setCorrect((value) => value + 1)
+      }
+      return
     } else {
       isCorrect = question.pairs.every(
         (pair) => normalizeAnswer(matchAnswer[pair.left] ?? '') === normalizeAnswer(pair.right),
       )
     }
 
-    setResult({ isCorrect })
+    setResult({
+      status: isCorrect ? 'correct' : 'incorrect',
+      missingConceptLabels: [],
+    })
     setChecked(true)
     setAttempts((value) => value + 1)
     if (isCorrect) {
@@ -267,9 +280,27 @@ export function NetworkingDrillPractice({
 
           {checked && result ? (
             <div className="result-box">
-              <p className={`status ${result.isCorrect ? 'correct' : 'incorrect'}`}>
-                {result.isCorrect ? 'Correct' : 'Incorrect'}
+              <p
+                className={`status ${
+                  result.status === 'correct'
+                    ? 'correct'
+                    : result.status === 'partial'
+                      ? 'correct'
+                      : 'incorrect'
+                }`}
+              >
+                {result.status === 'correct'
+                  ? 'Correct'
+                  : result.status === 'partial'
+                    ? 'Partially Correct'
+                    : 'Incorrect'}
               </p>
+              {result.status === 'partial' ? (
+                <p>
+                  Partially correct — missing key concept:{' '}
+                  <strong>{result.missingConceptLabels.join(', ')}</strong>
+                </p>
+              ) : null}
               {renderCorrectAnswer()}
               <table className="compact-table">
                 <thead>
