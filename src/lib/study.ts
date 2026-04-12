@@ -47,7 +47,7 @@ export const UNIT_OPTIONS: UnitOption[] = [
     implemented: true,
     questionCount: 'infinity',
   },
-  { id: 'threads', label: 'Threads', implemented: false },
+  { id: 'threads', label: 'Threads', implemented: true, questionCount: 12 },
   { id: 'sync-mutex', label: 'Synchronization: Mutex', implemented: false },
   { id: 'sync-patterns', label: 'Synchronization: Patterns', implemented: true, questionCount: 4 },
   { id: 'file-io', label: 'File I/O: Calls', implemented: true, questionCount: 12 },
