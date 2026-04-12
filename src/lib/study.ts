@@ -40,7 +40,7 @@ export const UNIT_OPTIONS: UnitOption[] = [
   { id: 'wait-errno', label: 'wait() and errno', implemented: true, questionCount: 2 },
   { id: 'signals', label: 'Signals', implemented: false },
   { id: 'scheduling', label: 'Scheduling', implemented: true, questionCount: 'infinity' },
-  { id: 'memory-management', label: 'Memory Management', implemented: false },
+  { id: 'memory-management', label: 'Memory Management', implemented: true, questionCount: 23 },
   {
     id: 'virtual-memory',
     label: 'Virtual Memory',
