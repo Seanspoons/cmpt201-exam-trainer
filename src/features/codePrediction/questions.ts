@@ -39,6 +39,51 @@ printf("X\\n");`,
     concepts: ['fork duplicates process state', 'post-fork code runs in both processes'],
   },
   {
+    id: 'fork-parent-child-branch',
+    prompt: 'What lines print (order may vary)?',
+    code: `if (fork() == 0) {
+  printf("child\\n");
+} else {
+  printf("parent\\n");
+}`,
+    correctAnswers: [
+      'prints parent and child once each (order may vary)',
+      'one parent line and one child line',
+      'child and parent both print once',
+    ],
+    explanationSteps: [
+      'Step 1: fork() creates parent and child processes.',
+      'Step 2: Child sees return value 0 and runs the if branch.',
+      'Step 3: Parent sees non-zero return and runs the else branch.',
+      'Step 4: Exactly one "child" and one "parent" are printed; scheduling controls order.',
+    ],
+    concepts: ['fork return values differ in parent/child', 'scheduler affects print order'],
+    nonDeterministicNote: 'Relative order of parent/child lines is non-deterministic.',
+  },
+  {
+    id: 'fork-exec-child',
+    prompt: 'What definitely prints from this program?',
+    code: `if (fork() == 0) {
+  execl("/bin/echo", "echo", "Hi", NULL);
+  printf("This does not run\\n");
+}
+printf("Done\\n");`,
+    correctAnswers: [
+      'child prints hi and parent prints done; "this does not run" is not printed if exec succeeds',
+      'hi and done print, but not "this does not run" on successful exec',
+      'exec replaces child process so post-exec child printf does not run',
+    ],
+    explanationSteps: [
+      'Step 1: fork() creates child and parent.',
+      'Step 2: Child calls exec and is replaced by /bin/echo on success.',
+      'Step 3: Replaced child does not execute the post-exec printf line.',
+      'Step 4: Parent continues and prints "Done".',
+    ],
+    concepts: ['exec process replacement', 'fork creates separate control flow'],
+    nonDeterministicNote:
+      '"Hi" and "Done" ordering can vary unless synchronized with wait().',
+  },
+  {
     id: 'exec-replace',
     prompt: 'What output behavior is correct for this snippet?',
     code: `printf("A\\n");
@@ -56,6 +101,28 @@ printf("B\\n");`,
       'Step 4: B prints only if exec fails.',
     ],
     concepts: ['exec replaces current process', 'code after successful exec is not executed'],
+  },
+  {
+    id: 'pipe-write-read',
+    prompt: 'What does the parent print?',
+    code: `pipe(fd);
+if (fork() == 0) {
+  close(fd[0]);
+  write(fd[1], "OK", 2);
+} else {
+  close(fd[1]);
+  char buf[3] = {0};
+  read(fd[0], buf, 2);
+  printf("%s\\n", buf);
+}`,
+    correctAnswers: ['ok', 'prints ok'],
+    explanationSteps: [
+      'Step 1: Child closes read end and writes 2 bytes "OK".',
+      'Step 2: Parent closes write end and reads exactly 2 bytes.',
+      'Step 3: Buffer already has trailing \\0 from initialization.',
+      'Step 4: Parent prints "OK".',
+    ],
+    concepts: ['pipe unidirectional data flow', 'close unused ends in each process'],
   },
   {
     id: 'pipe-block',
@@ -100,5 +167,24 @@ printf("%s\\n", buf);`,
       'Step 4: Add a terminator when space permits before printing as a string.',
     ],
     concepts: ['read vs C-string conventions', 'memory safety in output'],
+  },
+  {
+    id: 'stdio-buffering',
+    prompt: 'Immediately after fprintf and before fclose, what may be true?',
+    code: `FILE* f = fopen("tmp.txt", "w");
+fprintf(f, "Hello");
+sleep(10);`,
+    correctAnswers: [
+      'hello may still be only in user-space stdio buffer until flush or close',
+      'data is buffered and may not be written to disk yet',
+      'without fflush/fclose the file may appear empty during sleep',
+    ],
+    explanationSteps: [
+      'Step 1: fopen creates a stdio stream with buffering.',
+      'Step 2: fprintf writes to the stdio buffer first.',
+      'Step 3: sleep does not force a flush.',
+      'Step 4: Data is guaranteed written after fflush/fclose/normal process exit.',
+    ],
+    concepts: ['stdio buffering behavior', 'flush semantics vs immediate write'],
   },
 ]
