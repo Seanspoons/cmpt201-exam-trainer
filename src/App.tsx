@@ -128,7 +128,12 @@ function App() {
               }`}
               onClick={() => selectUnit(unit.id)}
             >
-              <span>{unit.label}</span>
+              <span className="unit-drawer-label">
+                {unit.label}
+                {unit.implemented ? null : (
+                  <span className="unit-status-badge">Coming Soon</span>
+                )}
+              </span>
               <FiChevronRight aria-hidden="true" />
             </button>
           ))}
