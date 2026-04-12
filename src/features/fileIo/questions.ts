@@ -28,6 +28,10 @@ const OFFSET_AND_LSEEK_QUESTIONS: NetworkingQuestion[] = [
     kind: 'text',
     prompt:
       'File content is "Hello!", current offset is 4, then read(fd, buf, 1) runs. What character is read?',
+    code: `// file bytes: H e l l o !
+// indexes:    0 1 2 3 4 5
+lseek(fd, 4, SEEK_SET);
+read(fd, buf, 1);`,
     requiredConcepts: [{ label: 'Character o', keywords: ['o', "'o'", '"o"'] }],
     answerDisplay: "'o'",
     explanationSteps: [
@@ -42,6 +46,8 @@ const OFFSET_AND_LSEEK_QUESTIONS: NetworkingQuestion[] = [
     kind: 'text',
     prompt:
       'Given lseek(fd, -1, SEEK_END); read(fd, buf, 1); what byte is read from a non-empty file?',
+    code: `lseek(fd, -1, SEEK_END);
+read(fd, buf, 1);`,
     requiredConcepts: [
       { label: 'Last character/byte', keywords: ['last', 'final', 'end byte'] },
     ],
@@ -77,6 +83,7 @@ const READ_WRITE_BEHAVIOR_QUESTIONS: NetworkingQuestion[] = [
     kind: 'text',
     prompt:
       'A call read(fd, buf, 10) runs when only 4 bytes are currently available. What can read() return?',
+    code: `ssize_t n = read(fd, buf, 10);`,
     requiredConcepts: [
       { label: 'Returns 4', keywords: ['4', 'four bytes'] },
       { label: 'Can return fewer than requested', keywords: ['less than requested', 'partial read', 'fewer bytes'] },
@@ -93,6 +100,7 @@ const READ_WRITE_BEHAVIOR_QUESTIONS: NetworkingQuestion[] = [
     id: 'fileio-write-partial',
     kind: 'mcq',
     prompt: 'Can write(fd, buf, n) return less than n?',
+    code: `ssize_t n = write(fd, buf, requested);`,
     options: [
       'Yes, partial writes are possible',
       'No, write always writes exactly n bytes',
@@ -115,6 +123,9 @@ const BUFFERING_QUESTIONS: NetworkingQuestion[] = [
     kind: 'text',
     prompt:
       'What may be true after fprintf(file, "Hello"); sleep(10); if fflush/fclose is not called yet?',
+    code: `FILE* file = fopen("tmp.txt", "w");
+fprintf(file, "Hello");
+sleep(10);`,
     requiredConcepts: [
       { label: 'Data may still be buffered', keywords: ['buffered', 'buffer', 'not flushed'] },
       { label: 'Not guaranteed in file yet', keywords: ['not written yet', 'may be empty', 'not on disk yet'] },
@@ -123,6 +134,7 @@ const BUFFERING_QUESTIONS: NetworkingQuestion[] = [
     explanationSteps: [
       'fprintf writes to stdio buffer first.',
       'sleep does not flush stdio.',
+      'write(fd, ...) would go directly through the kernel syscall path.',
       'Flush happens on buffer-full, fflush, fclose, or normal exit.',
     ],
     conceptSummary: 'fprintf is buffered; write is direct syscall path.',
@@ -145,6 +157,10 @@ const BUFFERING_QUESTIONS: NetworkingQuestion[] = [
     kind: 'text',
     prompt:
       'Potential issue: write(fd, "A", 1); fprintf(file, "B"); (same underlying file). What bug may appear?',
+    code: `int fd = open("tmp.txt", O_WRONLY);
+FILE* file = fdopen(fd, "w");
+write(fd, "A", 1);
+fprintf(file, "B");`,
     requiredConcepts: [
       { label: 'Unexpected ordering', keywords: ['order', 'ordering', 'out of order'] },
       { label: 'Buffering mismatch', keywords: ['buffered', 'fprintf buffer', 'mixing', 'stdio and syscall'] },
@@ -184,6 +200,7 @@ const EOF_AND_PARTIAL_READS_QUESTIONS: NetworkingQuestion[] = [
     id: 'fileio-read-eof',
     kind: 'text',
     prompt: 'What does read() return at EOF on a regular file?',
+    code: `ssize_t n = read(fd, buf, 128); // fd is already at EOF`,
     requiredConcepts: [{ label: 'Returns 0', keywords: ['0', 'zero'] }],
     answerDisplay: '0',
     explanationSteps: [
@@ -201,6 +218,8 @@ const BLOCKING_NONBLOCKING_QUESTIONS: NetworkingQuestion[] = [
     kind: 'text',
     prompt:
       'For a non-blocking descriptor with no data available, what does read() do?',
+    code: `fcntl(fd, F_SETFL, O_NONBLOCK);
+ssize_t n = read(fd, buf, sizeof(buf));`,
     requiredConcepts: [
       { label: 'Returns -1/error', keywords: ['-1', 'error'] },
       { label: 'EAGAIN or EWOULDBLOCK', keywords: ['eagain', 'ewouldblock'] },
@@ -242,4 +261,3 @@ export function generateFileIoEofPartialQuestion(): NetworkingQuestion {
 export function generateFileIoBlockingQuestion(): NetworkingQuestion {
   return randomPick(BLOCKING_NONBLOCKING_QUESTIONS)
 }
-
