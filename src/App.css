@@ -464,6 +464,10 @@
   background: linear-gradient(180deg, #fcfdff, #f6f8fc);
 }
 
+.nested-choice-panel--memory {
+  background: linear-gradient(180deg, #fbf9ff, #f6f4ff);
+}
+
 .nested-choice-label {
   margin: 0 0 0.42rem;
   font-size: 0.78rem;
@@ -496,6 +500,12 @@
   background: #f5f7fb;
   border-color: #cdd5e2;
   color: #32445d;
+}
+
+.nested-choice-button--memory {
+  background: #f3f0ff;
+  border-color: #d2c8f0;
+  color: #3f3566;
 }
 
 .nested-choice-button--active,

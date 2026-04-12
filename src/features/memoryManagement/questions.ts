@@ -485,4 +485,14 @@ export function generateFitStrategyComparisonQuestion(): NetworkingQuestion {
   return randomPick(STRATEGY_COMPARISON_QUESTIONS)
 }
 
+export function generateRandomAllocationStrategyQuestion(): NetworkingQuestion {
+  return randomPick([
+    ...ALLOCATION_TRACING_QUESTIONS,
+    ...FIRST_FIT_QUESTIONS,
+    ...BEST_FIT_QUESTIONS,
+    ...WORST_FIT_QUESTIONS,
+    ...STRATEGY_COMPARISON_QUESTIONS,
+  ])
+}
+
 export const MEMORY_MANAGEMENT_QUESTION_COUNT = 23
