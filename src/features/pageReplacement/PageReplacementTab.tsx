@@ -37,8 +37,9 @@ function formatVictimPointer(pointer: number | undefined): string {
 
 export function PageReplacementTab() {
   const [question, setQuestion] = useState<PageReplacementQuestion | null>(null)
-  const [selectedAlgorithm, setSelectedAlgorithm] =
-    useState<PageReplacementAlgorithm>('FIFO')
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState<
+    PageReplacementAlgorithm | 'Random'
+  >('Random')
   const [faultAnswer, setFaultAnswer] = useState('')
   const [frameAnswer, setFrameAnswer] = useState('')
   const [checked, setChecked] = useState(false)
@@ -49,7 +50,11 @@ export function PageReplacementTab() {
   const solution = question ? solvePageReplacement(question) : null
 
   const generateQuestion = () => {
-    setQuestion(generatePageReplacementQuestion(selectedAlgorithm))
+    setQuestion(
+      generatePageReplacementQuestion(
+        selectedAlgorithm === 'Random' ? undefined : selectedAlgorithm,
+      ),
+    )
     setFaultAnswer('')
     setFrameAnswer('')
     setChecked(false)
@@ -102,14 +107,17 @@ export function PageReplacementTab() {
     <div>
       <h2 className="section-title">Page Replacement</h2>
       <div className="controls-row">
-        <label className="field" style={{ minWidth: 180, marginBottom: 0 }}>
-          <span>Algorithm</span>
+        <label className="inline-control">
+          <span>Algorithm:</span>
           <select
             value={selectedAlgorithm}
             onChange={(event) =>
-              setSelectedAlgorithm(event.target.value as PageReplacementAlgorithm)
+              setSelectedAlgorithm(
+                event.target.value as PageReplacementAlgorithm | 'Random',
+              )
             }
           >
+            <option value="Random">Random</option>
             <option value="FIFO">FIFO</option>
             <option value="LRU">LRU</option>
             <option value="Second Chance">Second Chance</option>

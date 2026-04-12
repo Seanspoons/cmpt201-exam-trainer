@@ -36,8 +36,16 @@
 .controls-row {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.9rem;
+}
+
+.inline-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.92rem;
 }
 
 .question-box,
