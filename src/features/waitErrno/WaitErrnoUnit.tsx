@@ -1,9 +1,12 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
-import { CodePredictionPractice } from '../codePrediction/CodePredictionPractice'
+import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
 import {
+  generateChildExitStatusQuestion,
   generateErrnoQuestion,
-  generateWaitQuestion,
-} from '../codePrediction/questions'
+  generateWaitBasicsQuestion,
+  generateWstatusQuestion,
+  generateZombieQuestion,
+} from './questions'
 
 export function WaitErrnoUnit() {
   return (
@@ -11,34 +14,56 @@ export function WaitErrnoUnit() {
       unitLabel="wait() and errno"
       subtopics={[
         {
-          id: 'wait-basics',
-          label: 'wait basics',
+          id: 'waitpid-basics',
+          label: 'wait() / waitpid() Basics',
           render: () => (
-            <CodePredictionPractice
+            <NetworkingDrillPractice
               key="wait-errno-wait"
-              title="wait() and errno > wait basics"
-              generateQuestion={generateWaitQuestion}
+              title="wait() and errno > wait() / waitpid() Basics"
+              generateQuestion={generateWaitBasicsQuestion}
             />
           ),
         },
         {
-          id: 'zombies-and-reaping',
-          label: 'zombies and reaping',
+          id: 'wstatus-output-params',
+          label: 'wstatus and Output Parameters',
           render: () => (
-            <CodePredictionPractice
-              key="wait-errno-zombies"
-              title="wait() and errno > zombies and reaping"
-              generateQuestion={generateWaitQuestion}
+            <NetworkingDrillPractice
+              key="wait-errno-wstatus"
+              title="wait() and errno > wstatus and Output Parameters"
+              generateQuestion={generateWstatusQuestion}
             />
           ),
         },
         {
-          id: 'errno-checking',
-          label: 'errno checks',
+          id: 'child-exit-status',
+          label: 'Child Exit Status',
           render: () => (
-            <CodePredictionPractice
-              key="wait-errno-errno"
-              title="wait() and errno > errno checks"
+            <NetworkingDrillPractice
+              key="wait-errno-child-exit-status"
+              title="wait() and errno > Child Exit Status"
+              generateQuestion={generateChildExitStatusQuestion}
+            />
+          ),
+        },
+        {
+          id: 'zombies-orphans',
+          label: 'Zombies and Orphans',
+          render: () => (
+            <NetworkingDrillPractice
+              key="wait-errno-zombies-orphans"
+              title="wait() and errno > Zombies and Orphans"
+              generateQuestion={generateZombieQuestion}
+            />
+          ),
+        },
+        {
+          id: 'errno-perror-patterns',
+          label: 'errno and perror()',
+          render: () => (
+            <NetworkingDrillPractice
+              key="wait-errno-errno-perror"
+              title="wait() and errno > errno and perror()"
               generateQuestion={generateErrnoQuestion}
             />
           ),
