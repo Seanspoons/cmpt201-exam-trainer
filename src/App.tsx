@@ -147,6 +147,9 @@ function App() {
         />
       ) : null}
       <section className="tab-panel">{renderUnit()}</section>
+      <footer className="app-footer">
+        <p>&copy; {new Date().getFullYear()} Sean Wotherspoon</p>
+      </footer>
     </main>
   )
 }
