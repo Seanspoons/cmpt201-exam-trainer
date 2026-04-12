@@ -59,6 +59,7 @@ export function CodePredictionTab() {
               value={answer}
               onChange={(event) => setAnswer(event.target.value)}
             />
+            <p className="small-note">Checking ignores case and extra spaces.</p>
           </div>
           <div style={{ marginTop: '0.65rem' }}>
             <button onClick={checkAnswer} disabled={!answer.trim()}>
