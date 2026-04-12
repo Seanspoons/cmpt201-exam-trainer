@@ -50,10 +50,11 @@ export function PageReplacementTab() {
   const [frameAnswer, setFrameAnswer] = useState('')
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
+  const [attemptId, setAttemptId] = useState<number | null>(null)
   const [result, setResult] = useState<CheckResult | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
-  const { recordAttempt } = useSessionContext()
+  const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
 
   const solution = question ? solvePageReplacement(question) : null
@@ -74,6 +75,7 @@ export function PageReplacementTab() {
       )
       resetAnswerInputs()
       setHasCountedAttempt(false)
+      setAttemptId(null)
     })
   }
 
@@ -113,11 +115,12 @@ export function PageReplacementTab() {
 
     const isCorrect = faultsCorrect && framesCorrect
     if (!hasCountedAttempt) {
-      recordAttempt({
+      const id = recordAttempt({
         unitLabel,
         subtopicLabel,
         isCorrect,
       })
+      setAttemptId(id)
       setHasCountedAttempt(true)
     }
     setResult({
@@ -216,6 +219,27 @@ export function PageReplacementTab() {
           {checked && result && solution ? (
             <AnswerFeedbackCard
               status={result.isCorrect ? 'correct' : 'incorrect'}
+              onMarkCorrect={
+                !result.isCorrect
+                  ? () => {
+                      if (attemptId !== null) {
+                        overrideAttemptResult(attemptId, true)
+                      }
+                      setResult((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              isCorrect: true,
+                              message: 'Marked as correct by you.',
+                            }
+                          : {
+                              isCorrect: true,
+                              message: 'Marked as correct by you.',
+                            },
+                      )
+                    }
+                  : undefined
+              }
               answerContent={
                 <>
                   <p>{result.message}</p>

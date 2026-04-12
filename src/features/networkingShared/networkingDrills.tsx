@@ -355,7 +355,7 @@ export function NetworkingDrillPractice({
               status={result.status}
               missingConceptLabels={result.missingConceptLabels}
               onMarkCorrect={
-                result.status === 'partial'
+                result.status !== 'correct'
                   ? () => {
                       if (attemptId !== null) {
                         overrideAttemptResult(attemptId, true)

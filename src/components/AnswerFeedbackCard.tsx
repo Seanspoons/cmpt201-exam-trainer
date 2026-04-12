@@ -64,6 +64,15 @@ export function AnswerFeedbackCard({
         </div>
       ) : null}
 
+      {status === 'incorrect' && onMarkCorrect ? (
+        <div className="answer-feedback-note-row">
+          <p className="answer-feedback-note">Think your answer was still valid?</p>
+          <button className="button-secondary" onClick={onMarkCorrect}>
+            I got it correct
+          </button>
+        </div>
+      ) : null}
+
       <section className="answer-feedback-section">
         <h4 className="answer-feedback-title">
           <FiTarget aria-hidden="true" />

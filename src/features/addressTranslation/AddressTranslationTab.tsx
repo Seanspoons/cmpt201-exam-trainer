@@ -24,10 +24,11 @@ export function AddressTranslationTab() {
   const [physicalAnswer, setPhysicalAnswer] = useState('')
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
+  const [attemptId, setAttemptId] = useState<number | null>(null)
   const [result, setResult] = useState<CheckResult | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
-  const { recordAttempt } = useSessionContext()
+  const { recordAttempt, overrideAttemptResult } = useSessionContext()
   const { unitLabel, subtopicLabel } = useTopicContext()
 
   const solution = question ? solveAddressTranslation(question) : null
@@ -51,6 +52,7 @@ export function AddressTranslationTab() {
       setQuestion(generateAddressTranslationQuestion())
       resetInputs()
       setHasCountedAttempt(false)
+      setAttemptId(null)
     })
   }
 
@@ -63,11 +65,12 @@ export function AddressTranslationTab() {
 
     const isCorrect = pageCorrect && offsetCorrect && physicalCorrect
     if (!hasCountedAttempt) {
-      recordAttempt({
+      const id = recordAttempt({
         unitLabel,
         subtopicLabel,
         isCorrect,
       })
+      setAttemptId(id)
       setHasCountedAttempt(true)
     }
     setResult({ isCorrect })
@@ -164,6 +167,16 @@ export function AddressTranslationTab() {
           {checked && result ? (
             <AnswerFeedbackCard
               status={result.isCorrect ? 'correct' : 'incorrect'}
+              onMarkCorrect={
+                !result.isCorrect
+                  ? () => {
+                      if (attemptId !== null) {
+                        overrideAttemptResult(attemptId, true)
+                      }
+                      setResult({ isCorrect: true })
+                    }
+                  : undefined
+              }
               answerContent={
                 <>
                   <p>
