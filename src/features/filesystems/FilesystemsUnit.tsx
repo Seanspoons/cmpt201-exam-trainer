@@ -3,7 +3,7 @@ import { UnitScaffold } from '../../components/UnitScaffold'
 export function FilesystemsUnit() {
   return (
     <UnitScaffold
-      unitLabel="Filesystems"
+      unitLabel="File I/O: File Systems"
       subtopics={[
         {
           id: 'fs-paths-and-inodes',

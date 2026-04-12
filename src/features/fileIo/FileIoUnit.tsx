@@ -5,7 +5,7 @@ import { generateFileIoQuestion } from '../codePrediction/questions'
 export function FileIoUnit() {
   return (
     <UnitScaffold
-      unitLabel="File I/O"
+      unitLabel="File I/O: Calls"
       subtopics={[
         {
           id: 'fileio-read-write',
