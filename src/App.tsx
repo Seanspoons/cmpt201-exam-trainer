@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FiBookOpen, FiChevronRight, FiMenu, FiX } from 'react-icons/fi'
+import { FiBookOpen, FiChevronRight, FiMenu, FiX, FiInfo } from 'react-icons/fi'
 import { CryptoAlgorithmsUnit } from './features/cryptoAlgorithms/CryptoAlgorithmsUnit'
 import { CryptoApplicationsUnit } from './features/cryptoApplications/CryptoApplicationsUnit'
 import { FileIoUnit } from './features/fileIo/FileIoUnit'
@@ -27,6 +27,7 @@ function App() {
   const brandWordmarkSrc = `${import.meta.env.BASE_URL}cmpt-201-exam-trainer-wordmark.svg`
   const [activeUnit, setActiveUnit] = useState<UnitId>('virtual-memory')
   const [isUnitMenuOpen, setIsUnitMenuOpen] = useState(false)
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
 
   const selectUnit = (unitId: UnitId) => {
     setActiveUnit(unitId)
@@ -89,6 +90,31 @@ function App() {
             alt="CMPT 201 Exam Trainer"
             className="brand-wordmark"
           />
+          <button
+            className="info-trigger"
+            aria-label="About this tool"
+            type="button"
+            onMouseEnter={(e) => {
+              setTooltipPos({ x: e.clientX, y: e.clientY })
+            }}
+            onMouseMove={(e) => {
+              setTooltipPos({ x: e.clientX, y: e.clientY })
+            }}
+            onMouseLeave={() => setTooltipPos(null)}
+          >
+            <FiInfo aria-hidden="true" />
+          </button>
+          {tooltipPos && (
+            <div
+              className="info-tooltip-floating"
+              style={{
+                top: tooltipPos.y + 12,
+                left: tooltipPos.x + 12,
+              }}
+            >
+              Based on CMPT 201: Systems Programming D100 (Spring 2026)
+            </div>
+          )}
           <button
             className="button-secondary unit-menu-toggle"
             onClick={() => setIsUnitMenuOpen((value) => !value)}

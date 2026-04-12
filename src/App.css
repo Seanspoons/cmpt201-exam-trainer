@@ -150,6 +150,56 @@
 .brand-row {
   display: flex;
   align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.info-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 6px;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.info-trigger:hover {
+  background: #eef3f9;
+  color: var(--text);
+}
+
+.info-tooltip-floating {
+  position: fixed;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  box-shadow: 0 8px 20px rgba(8, 22, 41, 0.08);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 50;
+
+  opacity: 0;
+  transform: translateY(4px);
+  animation: tooltip-fade-in 120ms ease forwards;
+}
+
+@keyframes tooltip-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Prevent tooltip from going off-screen slightly */
+.info-tooltip-floating {
+  max-width: calc(100vw - 16px);
 }
 
 .brand-wordmark {
