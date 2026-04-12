@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FiBookOpen, FiChevronRight, FiMenu, FiX, FiInfo } from 'react-icons/fi'
 import { CryptoAlgorithmsUnit } from './features/cryptoAlgorithms/CryptoAlgorithmsUnit'
 import { CryptoApplicationsUnit } from './features/cryptoApplications/CryptoApplicationsUnit'
@@ -25,9 +25,20 @@ import { SessionProvider } from './components/SessionContext'
 import { UNIT_OPTIONS, type UnitId } from './lib/study'
 import './App.css'
 
+const ACTIVE_UNIT_STORAGE_KEY = 'cmpt201.nav.activeUnit.v1'
+
+function loadActiveUnit(): UnitId {
+  if (typeof window === 'undefined') return 'virtual-memory'
+  const raw = window.localStorage.getItem(ACTIVE_UNIT_STORAGE_KEY)
+  const fallback: UnitId = 'virtual-memory'
+  if (!raw) return fallback
+  const isKnown = UNIT_OPTIONS.some((option) => option.id === raw)
+  return isKnown ? (raw as UnitId) : fallback
+}
+
 function App() {
   const brandWordmarkSrc = `${import.meta.env.BASE_URL}cmpt-201-exam-trainer-wordmark.svg`
-  const [activeUnit, setActiveUnit] = useState<UnitId>('virtual-memory')
+  const [activeUnit, setActiveUnit] = useState<UnitId>(() => loadActiveUnit())
   const [isUnitMenuOpen, setIsUnitMenuOpen] = useState(false)
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
 
@@ -35,6 +46,11 @@ function App() {
     setActiveUnit(unitId)
     setIsUnitMenuOpen(false)
   }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem(ACTIVE_UNIT_STORAGE_KEY, activeUnit)
+  }, [activeUnit])
 
   const renderUnit = () => {
     switch (activeUnit) {

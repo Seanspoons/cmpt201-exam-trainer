@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AllTopicsProvider } from './AllTopicsContext'
 import { TopicProvider } from './TopicContext'
 import { TabNav } from './TabNav'
@@ -21,6 +21,10 @@ type UnitScaffoldProps = {
 
 const ALL_TOPICS_ID = '__all-topics' as SubtopicId
 
+function storageKeyForUnit(unitLabel: string): string {
+  return `cmpt201.nav.subtopic.${unitLabel}`
+}
+
 export function UnitScaffold({
   unitLabel,
   subtopics,
@@ -32,7 +36,15 @@ export function UnitScaffold({
   )
   const hasAllTopics = renderedSubtopics.length > 1
 
-  const initial = defaultSubtopicId ?? subtopics[0]?.id ?? 'overview'
+  const initial = (() => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem(storageKeyForUnit(unitLabel))
+      if (saved && subtopics.some((subtopic) => subtopic.id === saved)) {
+        return saved as SubtopicId
+      }
+    }
+    return defaultSubtopicId ?? subtopics[0]?.id ?? 'overview'
+  })()
   const [activeSubtopic, setActiveSubtopic] = useState<SubtopicId>(initial)
   const [allTopicsIndex, setAllTopicsIndex] = useState(0)
 
@@ -43,6 +55,12 @@ export function UnitScaffold({
   const tabOptions = hasAllTopics
     ? [{ id: ALL_TOPICS_ID, label: 'All Topics' }, ...subtopics]
     : subtopics
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (activeSubtopic === ALL_TOPICS_ID) return
+    window.localStorage.setItem(storageKeyForUnit(unitLabel), activeSubtopic)
+  }, [activeSubtopic, unitLabel])
 
   return (
     <div>

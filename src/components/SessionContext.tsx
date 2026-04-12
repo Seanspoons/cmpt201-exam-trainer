@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
 type ScoreBucket = {
@@ -56,9 +56,38 @@ const SessionContext = createContext<SessionContextValue>({
   resetSession: () => undefined,
 })
 
+const SESSION_STORAGE_KEY = 'cmpt201.session.attempts.v1'
+
+function loadAttemptsFromStorage(): AttemptRecord[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = window.localStorage.getItem(SESSION_STORAGE_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as AttemptRecord[]
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((item) => {
+      return (
+        typeof item?.id === 'number' &&
+        typeof item?.unitLabel === 'string' &&
+        typeof item?.subtopicLabel === 'string' &&
+        typeof item?.isCorrect === 'boolean'
+      )
+    })
+  } catch {
+    return []
+  }
+}
+
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [attempts, setAttempts] = useState<AttemptRecord[]>([])
-  const nextAttemptId = useRef(1)
+  const [attempts, setAttempts] = useState<AttemptRecord[]>(() => loadAttemptsFromStorage())
+  const nextAttemptId = useRef(
+    attempts.reduce((max, attempt) => Math.max(max, attempt.id), 0) + 1,
+  )
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(attempts))
+  }, [attempts])
 
   const recordAttempt: SessionContextValue['recordAttempt'] = ({
     unitLabel,
@@ -140,6 +169,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       resetSession: () => {
         setAttempts([])
         nextAttemptId.current = 1
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem(SESSION_STORAGE_KEY)
+        }
       },
     }),
     [state],
