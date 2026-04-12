@@ -124,23 +124,23 @@ export function PageReplacementTab() {
   return (
     <div>
       <h2 className="section-title">Page Replacement</h2>
-      <div className="controls-row">
-        <label className="inline-control">
-          <span>Algorithm:</span>
-          <select
-            value={selectedAlgorithm}
-            onChange={(event) =>
-              setSelectedAlgorithm(
-                event.target.value as PageReplacementAlgorithm | 'Random',
-              )
-            }
-          >
-            <option value="Random">Random</option>
-            <option value="FIFO">FIFO</option>
-            <option value="LRU">LRU</option>
-            <option value="Second Chance">Second Chance</option>
-          </select>
-        </label>
+      <div className="nested-choice-panel nested-choice-panel--vm">
+        <p className="nested-choice-label">Page Replacement Algorithm</p>
+        <div className="nested-choice-row" role="tablist" aria-label="Page replacement algorithm">
+          {(['Random', 'FIFO', 'LRU', 'Second Chance'] as const).map((algorithm) => (
+            <button
+              key={algorithm}
+              role="tab"
+              aria-selected={selectedAlgorithm === algorithm}
+              className={`nested-choice-button nested-choice-button--vm ${
+                selectedAlgorithm === algorithm ? 'nested-choice-button--active' : ''
+              }`}
+              onClick={() => setSelectedAlgorithm(algorithm)}
+            >
+              {algorithm}
+            </button>
+          ))}
+        </div>
       </div>
       <QuestionControlBar
         hasQuestion={Boolean(question)}

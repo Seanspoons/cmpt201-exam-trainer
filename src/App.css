@@ -361,6 +361,63 @@
   color: var(--muted);
 }
 
+.nested-choice-panel {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f7fafe;
+  padding: 0.56rem 0.6rem;
+  margin-bottom: 0.65rem;
+}
+
+.nested-choice-panel--vm {
+  background: linear-gradient(180deg, #f8fbff, #f4f8ff);
+}
+
+.nested-choice-panel--scheduling {
+  background: linear-gradient(180deg, #fcfdff, #f6f8fc);
+}
+
+.nested-choice-label {
+  margin: 0 0 0.42rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #3f526b;
+  text-transform: uppercase;
+}
+
+.nested-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.nested-choice-button {
+  border-radius: 999px;
+  padding: 0.28rem 0.66rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.nested-choice-button--vm {
+  background: #edf4ff;
+  border-color: #bed0ea;
+  color: #143d72;
+}
+
+.nested-choice-button--scheduling {
+  background: #f5f7fb;
+  border-color: #cdd5e2;
+  color: #32445d;
+}
+
+.nested-choice-button--active,
+.nested-choice-button[aria-selected='true'] {
+  border-color: #5c8dcf;
+  background: #dcecff;
+  color: #0f3463;
+}
+
 .question-box,
 .result-box {
   border: 1px solid var(--border);
