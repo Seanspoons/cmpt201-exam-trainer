@@ -687,6 +687,25 @@ button:disabled {
   color: var(--muted);
 }
 
+.all-topics-bar {
+  margin: 0.25rem 0 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f8fbff;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.all-topics-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #3d4f67;
+}
+
 @keyframes feedback-enter {
   from {
     opacity: 0;
