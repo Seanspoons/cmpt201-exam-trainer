@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { gradeByConceptGroups } from '../../lib/semanticGrading'
 import { randomPick } from '../../lib/random'
 import {
@@ -127,30 +128,11 @@ export function ConcurrencyDebugTab() {
           </div>
 
           {checked && result ? (
-            <div className="result-box">
-              <p
-                className={`status ${
-                  result.status === 'correct'
-                    ? 'correct'
-                    : result.status === 'partial'
-                      ? 'correct'
-                      : 'incorrect'
-                }`}
-              >
-                {result.status === 'correct'
-                  ? 'Correct'
-                  : result.status === 'partial'
-                    ? 'Partially Correct'
-                    : 'Incorrect'}
-              </p>
-              {result.status === 'partial' ? (
-                <p>
-                  Partially correct — missing key concept:{' '}
-                  <strong>{result.missingConceptLabels.join(', ')}</strong>
-                </p>
-              ) : null}
-              {question.type === 'mcq' ? (
-                <>
+            <AnswerFeedbackCard
+              status={result.status}
+              missingConceptLabels={result.missingConceptLabels}
+              answerContent={
+                question.type === 'mcq' ? (
                   <p>
                     Expected answer:{' '}
                     <strong>
@@ -158,6 +140,15 @@ export function ConcurrencyDebugTab() {
                       {question.options[question.correctOption]}
                     </strong>
                   </p>
+                ) : (
+                  <p>
+                    Acceptable answer: <strong>{question.sampleAnswer}</strong>
+                  </p>
+                )
+              }
+              explanationContent={
+                question.type === 'mcq' ? (
+                  <>
                   <p>{question.explanation}</p>
                   <div className="table-scroll">
                     <table className="compact-table">
@@ -179,17 +170,13 @@ export function ConcurrencyDebugTab() {
                       </tbody>
                     </table>
                   </div>
-                </>
-              ) : (
-                <>
-                  <p>
-                    Acceptable answer: <strong>{question.sampleAnswer}</strong>
-                  </p>
+                  </>
+                ) : (
                   <p>{question.explanation}</p>
-                </>
-              )}
-              <p className="small-note">Bug location/concept: {question.bugSpot}</p>
-            </div>
+                )
+              }
+              conceptSummary={`Bug location/concept: ${question.bugSpot}`}
+            />
           ) : null}
         </>
       ) : (

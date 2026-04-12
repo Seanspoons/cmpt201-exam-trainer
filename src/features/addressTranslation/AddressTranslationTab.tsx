@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import {
   binaryMatches,
   generateAddressTranslationQuestion,
@@ -129,41 +130,50 @@ export function AddressTranslationTab() {
           </button>
 
           {checked && result ? (
-            <div className="result-box">
-              <p className={`status ${result.isCorrect ? 'correct' : 'incorrect'}`}>
-                {result.isCorrect ? 'Correct' : 'Incorrect'}
-              </p>
-              <p>
-                Expected page number: <strong className="mono">{solution.pageBinary}</strong>
-              </p>
-              <p>Expected offset: <strong className="mono">{solution.offsetBinary}</strong></p>
-              <p>
-                Expected physical address:{' '}
-                <strong className="mono">{solution.physicalBinary}</strong>
-              </p>
-
-              <p className="small-note">
-                Step 1: Page size {question.pageSize} = 2^{question.offsetBits}, so offset uses{' '}
-                {question.offsetBits} bits.
-              </p>
-              <p className="small-note">
-                Step 2: Split VA {solution.virtualBinary} into page | offset:
-              </p>
-              <p className="mono">
-                [{solution.pageBinary}] | [{solution.offsetBinary}]
-              </p>
-              <p className="small-note">
-                Step 3: Lookup page {solution.pageBinary} in page table gives frame{' '}
-                {solution.frameBinary}.
-              </p>
-              <p className="small-note">
-                Step 4: Assemble PA = frame bits + offset bits.
-              </p>
-              <p className="mono">
-                [{solution.frameBinary}] + [{solution.offsetBinary}] ={' '}
-                {solution.physicalBinary}
-              </p>
-            </div>
+            <AnswerFeedbackCard
+              status={result.isCorrect ? 'correct' : 'incorrect'}
+              answerContent={
+                <>
+                  <p>
+                    Expected page number:{' '}
+                    <strong className="mono">{solution.pageBinary}</strong>
+                  </p>
+                  <p>
+                    Expected offset: <strong className="mono">{solution.offsetBinary}</strong>
+                  </p>
+                  <p>
+                    Expected physical address:{' '}
+                    <strong className="mono">{solution.physicalBinary}</strong>
+                  </p>
+                </>
+              }
+              explanationContent={
+                <>
+                  <p className="small-note">
+                    Step 1: Page size {question.pageSize} = 2^{question.offsetBits}, so offset
+                    uses {question.offsetBits} bits.
+                  </p>
+                  <p className="small-note">
+                    Step 2: Split VA {solution.virtualBinary} into page | offset:
+                  </p>
+                  <p className="mono">
+                    [{solution.pageBinary}] | [{solution.offsetBinary}]
+                  </p>
+                  <p className="small-note">
+                    Step 3: Lookup page {solution.pageBinary} in page table gives frame{' '}
+                    {solution.frameBinary}.
+                  </p>
+                  <p className="small-note">
+                    Step 4: Assemble PA = frame bits + offset bits.
+                  </p>
+                  <p className="mono">
+                    [{solution.frameBinary}] + [{solution.offsetBinary}] ={' '}
+                    {solution.physicalBinary}
+                  </p>
+                </>
+              }
+              conceptSummary="Address translation keeps offset bits unchanged and replaces page bits via the page table."
+            />
           ) : null}
         </>
       ) : (

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import type { ConceptGroup } from '../../lib/semanticGrading'
 import { gradeByConceptGroups } from '../../lib/semanticGrading'
 
@@ -279,67 +280,54 @@ export function NetworkingDrillPractice({
           </div>
 
           {checked && result ? (
-            <div className="result-box">
-              <p
-                className={`status ${
-                  result.status === 'correct'
-                    ? 'correct'
-                    : result.status === 'partial'
-                      ? 'correct'
-                      : 'incorrect'
-                }`}
-              >
-                {result.status === 'correct'
-                  ? 'Correct'
-                  : result.status === 'partial'
-                    ? 'Partially Correct'
-                    : 'Incorrect'}
-              </p>
-              {result.status === 'partial' ? (
-                <p>
-                  Partially correct — missing key concept:{' '}
-                  <strong>{result.missingConceptLabels.join(', ')}</strong>
-                </p>
-              ) : null}
-              {renderCorrectAnswer()}
-              <table className="compact-table">
-                <thead>
-                  <tr>
-                    <th>Step-by-step explanation</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {question.explanationSteps.map((step) => (
-                    <tr key={step}>
-                      <td>{step}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {question.comparisonTable ? (
+            <AnswerFeedbackCard
+              status={result.status}
+              missingConceptLabels={result.missingConceptLabels}
+              answerContent={renderCorrectAnswer()}
+              explanationContent={
                 <div className="table-scroll">
                   <table className="compact-table">
                     <thead>
                       <tr>
-                        {question.comparisonTable.headers.map((header) => (
-                          <th key={header}>{header}</th>
-                        ))}
+                        <th>Step-by-step explanation</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {question.comparisonTable.rows.map((row) => (
-                        <tr key={row.join('|')}>
-                          {row.map((cell) => (
-                            <td key={cell}>{cell}</td>
-                          ))}
+                      {question.explanationSteps.map((step) => (
+                        <tr key={step}>
+                          <td>{step}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              ) : null}
-              <p className="small-note">Concept summary: {question.conceptSummary}</p>
-            </div>
+              }
+              conceptSummary={`Concept summary: ${question.conceptSummary}`}
+              extraContent={
+                question.comparisonTable ? (
+                  <div className="table-scroll">
+                    <table className="compact-table">
+                      <thead>
+                        <tr>
+                          {question.comparisonTable.headers.map((header) => (
+                            <th key={header}>{header}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {question.comparisonTable.rows.map((row) => (
+                          <tr key={row.join('|')}>
+                            {row.map((cell) => (
+                              <td key={cell}>{cell}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : undefined
+              }
+            />
           ) : null}
         </>
       ) : (

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import {
   formatFrames,
   formatReferenceBits,
@@ -175,52 +176,56 @@ export function PageReplacementTab() {
           </button>
 
           {checked && result && solution ? (
-            <div className="result-box">
-              <p className={`status ${result.isCorrect ? 'correct' : 'incorrect'}`}>
-                {result.isCorrect ? 'Correct' : 'Incorrect'}
-              </p>
-              <p>{result.message}</p>
-              <p>
-                Expected total faults: <strong>{solution.totalFaults}</strong>
-              </p>
-              <p>
-                Expected final frames:{' '}
-                <strong className="mono">{formatFrames(solution.finalFrames)}</strong>
-              </p>
-
-              <div className="table-scroll">
-                <table className="compact-table">
-                  <thead>
-                    <tr>
-                      <th>Step</th>
-                      <th>Page</th>
-                      <th>Frames</th>
-                      <th>Ref Bits</th>
-                      <th>Victim Ptr</th>
-                      <th>Fault?</th>
-                      <th>Evicted</th>
-                      <th>Reason</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {solution.steps.map((step) => (
-                      <tr key={step.step}>
-                        <td>{step.step}</td>
-                        <td>{step.page}</td>
-                        <td className="mono">{formatFrames(step.frames)}</td>
-                        <td className="mono">{formatReferenceBits(step.referenceBits)}</td>
-                        <td className="mono">
-                          {formatVictimPointer(step.victimPointer)}
-                        </td>
-                        <td>{step.pageFault ? 'Yes' : 'No'}</td>
-                        <td>{step.evictedPage ?? '-'}</td>
-                        <td>{step.reason}</td>
+            <AnswerFeedbackCard
+              status={result.isCorrect ? 'correct' : 'incorrect'}
+              answerContent={
+                <>
+                  <p>{result.message}</p>
+                  <p>
+                    Expected total faults: <strong>{solution.totalFaults}</strong>
+                  </p>
+                  <p>
+                    Expected final frames:{' '}
+                    <strong className="mono">{formatFrames(solution.finalFrames)}</strong>
+                  </p>
+                </>
+              }
+              explanationContent={
+                <div className="table-scroll">
+                  <table className="compact-table">
+                    <thead>
+                      <tr>
+                        <th>Step</th>
+                        <th>Page</th>
+                        <th>Frames</th>
+                        <th>Ref Bits</th>
+                        <th>Victim Ptr</th>
+                        <th>Fault?</th>
+                        <th>Evicted</th>
+                        <th>Reason</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                    </thead>
+                    <tbody>
+                      {solution.steps.map((step) => (
+                        <tr key={step.step}>
+                          <td>{step.step}</td>
+                          <td>{step.page}</td>
+                          <td className="mono">{formatFrames(step.frames)}</td>
+                          <td className="mono">{formatReferenceBits(step.referenceBits)}</td>
+                          <td className="mono">
+                            {formatVictimPointer(step.victimPointer)}
+                          </td>
+                          <td>{step.pageFault ? 'Yes' : 'No'}</td>
+                          <td>{step.evictedPage ?? '-'}</td>
+                          <td>{step.reason}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              }
+              conceptSummary={`Algorithm: ${question.algorithm}. Eviction decisions follow algorithm-specific recency/order rules.`}
+            />
           ) : null}
         </>
       ) : (

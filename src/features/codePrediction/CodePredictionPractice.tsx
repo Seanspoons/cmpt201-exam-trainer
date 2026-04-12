@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import {
   gradePredictionAnswer,
   type CodePredictionQuestion,
@@ -83,59 +84,48 @@ export function CodePredictionPractice({
           </div>
 
           {checked && result ? (
-            <div className="result-box">
-              <p
-                className={`status ${
-                  result.status === 'correct'
-                    ? 'correct'
-                    : result.status === 'partial'
-                      ? 'correct'
-                      : 'incorrect'
-                }`}
-              >
-                {result.status === 'correct'
-                  ? 'Correct'
-                  : result.status === 'partial'
-                    ? 'Partially Correct'
-                    : 'Incorrect'}
-              </p>
-              {result.status === 'partial' ? (
-                <p>
-                  Partially correct — missing key concept:{' '}
-                  <strong>{result.missingConceptLabels.join(', ')}</strong>
-                </p>
-              ) : null}
-              <p>Accepted answer(s):</p>
-              <ul>
-                {question.correctAnswers.map((value) => (
-                  <li key={value}>
-                    <strong>{value}</strong>
-                  </li>
-                ))}
-              </ul>
-              <div className="table-scroll">
-                <table className="compact-table">
-                  <thead>
-                    <tr>
-                      <th>Step-by-step execution trace</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {question.explanationSteps.map((step) => (
-                      <tr key={step}>
-                        <td>{step}</td>
-                      </tr>
+            <AnswerFeedbackCard
+              status={result.status}
+              missingConceptLabels={result.missingConceptLabels}
+              answerContent={
+                <>
+                  <p>Accepted answer(s):</p>
+                  <ul>
+                    {question.correctAnswers.map((value) => (
+                      <li key={value}>
+                        <strong>{value}</strong>
+                      </li>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="small-note">Concepts: {question.concepts.join(', ')}</p>
-              {question.nonDeterministicNote ? (
-                <p className="small-note">
-                  Non-determinism note: {question.nonDeterministicNote}
-                </p>
-              ) : null}
-            </div>
+                  </ul>
+                </>
+              }
+              explanationContent={
+                <div className="table-scroll">
+                  <table className="compact-table">
+                    <thead>
+                      <tr>
+                        <th>Step-by-step execution trace</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {question.explanationSteps.map((step) => (
+                        <tr key={step}>
+                          <td>{step}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              }
+              conceptSummary={`Concepts: ${question.concepts.join(', ')}`}
+              extraContent={
+                question.nonDeterministicNote ? (
+                  <p className="small-note">
+                    Non-determinism note: {question.nonDeterministicNote}
+                  </p>
+                ) : undefined
+              }
+            />
           ) : null}
         </>
       ) : (
