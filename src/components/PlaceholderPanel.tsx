@@ -19,11 +19,11 @@ export function PlaceholderPanel({
       <div className="question-box placeholder-card">
         <p className="placeholder-head">
           <span className="placeholder-dot" aria-hidden="true"></span>
-          Scaffolded Subtopic
+          Coming Soon
         </p>
         <p>
           {message ??
-            'This subtopic is coming soon. Planned drills will include exam-style tracing, output prediction, and concept checks.'}
+            'This subtopic is coming soon. We are preparing exam-style tracing, output prediction, and concept-check drills.'}
         </p>
         {plannedDrills && plannedDrills.length > 0 ? (
           <ul>
@@ -33,8 +33,7 @@ export function PlaceholderPanel({
           </ul>
         ) : null}
         <p className="small-note">
-          Planned next: add exam-style question generators and step-by-step solutions
-          for this subtopic.
+          More practice sets will be added here in a future update.
         </p>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TabNav } from './components/TabNav'
+import { UnitPicker } from './components/UnitPicker'
 import { CryptoAlgorithmsUnit } from './features/cryptoAlgorithms/CryptoAlgorithmsUnit'
 import { CryptoApplicationsUnit } from './features/cryptoApplications/CryptoApplicationsUnit'
 import { FileIoUnit } from './features/fileIo/FileIoUnit'
@@ -87,11 +87,10 @@ function App() {
         <h1 className="visually-hidden">CMPT 201 Exam Trainer</h1>
         <p>Exam-style drills for CMPT 201 pre-midterm and post-midterm units</p>
       </header>
-      <TabNav
+      <UnitPicker
         options={UNIT_OPTIONS}
-        activeTab={activeUnit}
+        value={activeUnit}
         onChange={setActiveUnit}
-        variant="unit"
       />
       <section className="tab-panel">{renderUnit()}</section>
     </main>
