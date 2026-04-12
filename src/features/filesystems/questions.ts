@@ -42,18 +42,18 @@ const STD_FD_AND_DEVICE_QUESTIONS: NetworkingQuestion[] = [
   {
     id: 'fs-stdio-fd-012',
     kind: 'mcq',
-    prompt: 'Which mapping of standard file descriptors is correct?',
+    prompt: 'Which statement about standard file descriptors is correct?',
     options: [
-      '0=stdin, 1=stdout, 2=stderr',
-      '0=stdout, 1=stderr, 2=stdin',
-      '0=stdin, 1=stderr, 2=stdout',
-      '0=stderr, 1=stdin, 2=stdout',
+      '0=stdin, 1=stdout, 2=stderr, and children normally inherit them after fork()',
+      '0=stdout, 1=stderr, 2=stdin, and children never inherit them',
+      '0=stdin, 1=stderr, 2=stdout, and inheritance only happens after exec()',
+      'Standard fds are assigned randomly each run',
     ],
     correctOption: 0,
     explanationSteps: [
       'UNIX reserves fd 0,1,2 for standard streams.',
-      'Many programs assume these descriptors exist at startup.',
-      'stderr is fd 2.',
+      'fork() duplicates descriptor table entries into the child unless changed.',
+      'Many programs rely on inherited stdin/stdout/stderr behavior.',
     ],
     conceptSummary: 'Standard descriptors are fixed as 0/1/2 for stdin/stdout/stderr.',
   },
@@ -163,18 +163,19 @@ const HARD_LINK_QUESTIONS: NetworkingQuestion[] = [
   {
     id: 'fs-hard-link-limits',
     kind: 'mcq',
-    prompt: 'Which hard-link limitation is generally true?',
+    prompt: 'Which statement about hard links and rm/unlink behavior is correct?',
     options: [
-      'Hard links usually cannot cross filesystems and cannot hard-link directories',
-      'Hard links can cross filesystems freely and are preferred for directories',
-      'Hard links always create new inode numbers',
-      'Hard links are path strings stored in separate files',
+      'Hard links usually cannot cross filesystems; rm removes one name, data is reclaimed after last link and no open file refs',
+      'Hard links can cross filesystems; rm immediately erases file data even if other links/open refs exist',
+      'Hard links are separate path files like symlinks, so rm only deletes pointer text',
+      'Hard links are mainly for directories and are always preferred there',
     ],
     correctOption: 0,
     explanationSteps: [
       'Hard links reference inode identity inside one filesystem.',
       'Directory hard links are generally forbidden to avoid tree/cycle issues.',
-      'Cross-filesystem hard links are not generally supported.',
+      'rm/unlink removes a directory entry (link), not necessarily file data immediately.',
+      'File data is fully reclaimable when link count reaches zero and no process still has it open.',
     ],
     conceptSummary: 'Hard links are inode-based and constrained by filesystem boundaries/rules.',
   },
@@ -243,6 +244,7 @@ const VFS_AND_MOUNT_QUESTIONS: NetworkingQuestion[] = [
     explanationSteps: [
       'mount attaches a filesystem at a directory.',
       'That directory is the mount point.',
+      'umount detaches the filesystem from that mount point.',
       'VFS lets ext4/xfs/procfs/etc. present consistent file operations to userspace.',
     ],
     conceptSummary: 'VFS enables one unified namespace over many filesystem implementations.',
@@ -282,4 +284,3 @@ export function generateLinkComparisonQuestion(): NetworkingQuestion {
 }
 
 export const FILE_SYSTEMS_QUESTION_COUNT = 12
-
