@@ -125,10 +125,12 @@ export function AddressTranslationTab() {
               <p className={`status ${result.isCorrect ? 'correct' : 'incorrect'}`}>
                 {result.isCorrect ? 'Correct' : 'Incorrect'}
               </p>
-              <p>Correct page number: <strong className="mono">{solution.pageBinary}</strong></p>
-              <p>Correct offset: <strong className="mono">{solution.offsetBinary}</strong></p>
               <p>
-                Correct physical address:{' '}
+                Expected page number: <strong className="mono">{solution.pageBinary}</strong>
+              </p>
+              <p>Expected offset: <strong className="mono">{solution.offsetBinary}</strong></p>
+              <p>
+                Expected physical address:{' '}
                 <strong className="mono">{solution.physicalBinary}</strong>
               </p>
 

@@ -79,7 +79,7 @@ export function PageReplacementTab() {
     setResult({
       isCorrect,
       message: isCorrect
-        ? 'Correct.'
+        ? 'Your answer matches the expected result.'
         : 'Not correct yet. Review the table and try again.',
     })
     setAttempts((value) => value + 1)
@@ -145,10 +145,10 @@ export function PageReplacementTab() {
               </p>
               <p>{result.message}</p>
               <p>
-                Correct total faults: <strong>{solution.totalFaults}</strong>
+                Expected total faults: <strong>{solution.totalFaults}</strong>
               </p>
               <p>
-                Correct final frames:{' '}
+                Expected final frames:{' '}
                 <strong className="mono">{formatFrames(solution.finalFrames)}</strong>
               </p>
 

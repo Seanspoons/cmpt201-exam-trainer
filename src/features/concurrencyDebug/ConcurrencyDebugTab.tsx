@@ -118,7 +118,7 @@ export function ConcurrencyDebugTab() {
               {question.type === 'mcq' ? (
                 <>
                   <p>
-                    Correct answer:{' '}
+                    Expected answer:{' '}
                     <strong>
                       {String.fromCharCode(65 + question.correctOption)}.{' '}
                       {question.options[question.correctOption]}

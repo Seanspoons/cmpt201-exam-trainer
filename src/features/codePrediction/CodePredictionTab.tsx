@@ -74,7 +74,7 @@ export function CodePredictionTab() {
                 {result.isCorrect ? 'Correct' : 'Incorrect'}
               </p>
               <p>
-                Acceptable correct answer:{' '}
+                Expected answer:{' '}
                 <strong>{question.acceptableAnswer}</strong>
               </p>
               <table className="compact-table">
