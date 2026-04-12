@@ -64,9 +64,11 @@ export function CodePredictionTab() {
               onChange={(event) => setAnswer(event.target.value)}
             />
           </div>
-          <button onClick={checkAnswer} disabled={!answer.trim()}>
-            Check Answer
-          </button>
+          <div style={{ marginTop: '0.65rem' }}>
+            <button onClick={checkAnswer} disabled={!answer.trim()}>
+              Check Answer
+            </button>
+          </div>
 
           {checked && result ? (
             <div className="result-box">
