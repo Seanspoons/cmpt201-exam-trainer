@@ -20,6 +20,8 @@ import { ThreadsUnit } from './features/threads/ThreadsUnit'
 import { TourSystemsUnit } from './features/tourSystems/TourSystemsUnit'
 import { VirtualMemoryUnit } from './features/virtualMemory/VirtualMemoryUnit'
 import { WaitErrnoUnit } from './features/waitErrno/WaitErrnoUnit'
+import { SessionProgressPanel } from './components/SessionProgressPanel'
+import { SessionProvider } from './components/SessionContext'
 import { UNIT_OPTIONS, type UnitId } from './lib/study'
 import './App.css'
 
@@ -82,6 +84,7 @@ function App() {
   }
 
   return (
+    <SessionProvider>
     <main className="app-shell">
       <header className="app-header">
         <div className="brand-row">
@@ -128,6 +131,7 @@ function App() {
         <h1 className="visually-hidden">CMPT 201 Exam Trainer</h1>
         <p>Exam-style drills across all CMPT 201 lecture units</p>
       </header>
+      <SessionProgressPanel />
       <aside
         id="unit-drawer"
         className={`unit-drawer ${isUnitMenuOpen ? 'unit-drawer--open' : ''}`}
@@ -183,6 +187,7 @@ function App() {
         <p>&copy; {new Date().getFullYear()} Sean Wotherspoon</p>
       </footer>
     </main>
+    </SessionProvider>
   )
 }
 

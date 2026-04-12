@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AllTopicsProvider } from './AllTopicsContext'
+import { TopicProvider } from './TopicContext'
 import { TabNav } from './TabNav'
 import { PlaceholderPanel } from './PlaceholderPanel'
 import type { SubtopicId } from '../lib/study'
@@ -80,12 +81,26 @@ export function UnitScaffold({
                   ),
               }}
             >
-              {activeAllTopic?.render ? activeAllTopic.render() : null}
+              <TopicProvider
+                value={{
+                  unitLabel,
+                  subtopicLabel: activeAllTopic?.label ?? 'General',
+                }}
+              >
+                {activeAllTopic?.render ? activeAllTopic.render() : null}
+              </TopicProvider>
             </AllTopicsProvider>
           </div>
         </div>
       ) : selected?.render ? (
-        selected.render()
+        <TopicProvider
+          value={{
+            unitLabel,
+            subtopicLabel: selected.label,
+          }}
+        >
+          {selected.render()}
+        </TopicProvider>
       ) : (
         <PlaceholderPanel
           unitLabel={unitLabel}

@@ -228,6 +228,87 @@
   background: var(--panel);
 }
 
+.session-panel {
+  margin-top: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fbfdff, #f5f9ff);
+  padding: 0.75rem 0.9rem;
+}
+
+.session-panel-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.session-panel-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #1b3150;
+}
+
+.session-panel-stats,
+.session-panel-streak {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: #2f4767;
+}
+
+.session-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
+.session-panel-actions .button-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.session-review-grid {
+  margin-top: 0.72rem;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.session-review-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0.6rem;
+}
+
+.session-review-card h3 {
+  margin: 0 0 0.38rem;
+  font-size: 0.9rem;
+  color: #213a5d;
+}
+
+.session-review-card p {
+  margin: 0.2rem 0;
+  font-size: 0.86rem;
+  color: #3b4f69;
+}
+
+.session-review-card ul {
+  margin: 0.1rem 0 0;
+  padding-left: 1rem;
+}
+
+.session-review-card li {
+  margin: 0.15rem 0;
+  font-size: 0.86rem;
+}
+
+.session-review-card-wide {
+  grid-column: 1 / -1;
+}
+
 .app-footer {
   margin-top: 0.9rem;
   border: 1px solid var(--border);
