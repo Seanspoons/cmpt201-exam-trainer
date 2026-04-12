@@ -49,6 +49,10 @@
   background: #fafafa;
 }
 
+.result-box {
+  margin-top: 0.75rem;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
