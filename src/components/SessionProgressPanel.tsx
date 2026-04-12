@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { FiBarChart2, FiRotateCcw } from 'react-icons/fi'
+import { IoFlame } from 'react-icons/io5'
 import { calculateAccuracy, useSessionContext } from './SessionContext'
 
 type RankedEntry = {
@@ -26,9 +27,11 @@ export function SessionProgressPanel() {
   }, [state.byUnit])
 
   const strongUnits = rankedUnits.filter((entry) => entry.attempted > 0).slice(0, 3)
+  const strongLabels = new Set(strongUnits.map((entry) => entry.label))
   const weakUnits = [...rankedUnits]
     .filter((entry) => entry.attempted > 0)
-    .reverse()
+    .sort((a, b) => a.accuracy - b.accuracy)
+    .filter((entry) => !strongLabels.has(entry.label))
     .slice(0, 3)
 
   const rankedSubtopics = useMemo(() => {
@@ -54,7 +57,10 @@ export function SessionProgressPanel() {
             correct ({overallAccuracy}%)
           </p>
           <p className="session-panel-streak">
-            🔥 Streak: <strong>{state.currentStreak}</strong> &nbsp; Best:{' '}
+            <span className="session-streak-icon" aria-hidden="true">
+              <IoFlame />
+            </span>{' '}
+            Streak: <strong>{state.currentStreak}</strong> &nbsp; Best:{' '}
             <strong>{state.bestStreak}</strong>
           </p>
         </div>
@@ -145,4 +151,3 @@ export function SessionProgressPanel() {
     </section>
   )
 }
-

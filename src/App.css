@@ -256,6 +256,12 @@
   color: #2f4767;
 }
 
+.session-streak-icon {
+  display: inline-flex;
+  vertical-align: text-bottom;
+  color: #d16b17;
+}
+
 .session-panel-actions {
   display: flex;
   flex-wrap: wrap;
