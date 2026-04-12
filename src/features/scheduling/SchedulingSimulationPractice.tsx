@@ -174,6 +174,9 @@ export function SchedulingSimulationPractice({
       {question ? (
         <>
           <div className="question-box">
+            <p>
+              Using <strong>{question.algorithm}</strong>, solve this scheduling drill:
+            </p>
             <p>{question.prompt}</p>
             {question.quantum ? (
               <p className="small-note">
