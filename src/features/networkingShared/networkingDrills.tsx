@@ -5,6 +5,7 @@ import { useSessionContext } from '../../components/SessionContext'
 import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
+import { shuffleChoicesWithCorrectIndex, shuffledIndices } from '../../lib/questionRandomize'
 import type { ConceptGroup } from '../../lib/semanticGrading'
 import { gradeByConceptGroups } from '../../lib/semanticGrading'
 
@@ -64,6 +65,7 @@ export function NetworkingDrillPractice({
   const [mcqAnswer, setMcqAnswer] = useState<number | null>(null)
   const [textAnswer, setTextAnswer] = useState('')
   const [matchAnswer, setMatchAnswer] = useState<Record<string, string>>({})
+  const [matchOptionsOrder, setMatchOptionsOrder] = useState<string[]>([])
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
@@ -82,7 +84,28 @@ export function NetworkingDrillPractice({
 
   const generate = () => {
     transition.runQuestionTransition(() => {
-      setQuestion(generateQuestion())
+      const rawQuestion = generateQuestion()
+      if (rawQuestion.kind === 'mcq') {
+        const shuffled = shuffleChoicesWithCorrectIndex(
+          rawQuestion.options,
+          rawQuestion.correctOption,
+        )
+        setQuestion({
+          ...rawQuestion,
+          options: shuffled.choices,
+          correctOption: shuffled.correctIndex,
+        })
+        setMatchOptionsOrder([])
+      } else {
+        setQuestion(rawQuestion)
+        if (rawQuestion.kind === 'match') {
+          const options = rawQuestion.pairs.map((pair) => pair.right)
+          const shuffled = shuffledIndices(options.length).map((index) => options[index])
+          setMatchOptionsOrder(shuffled)
+        } else {
+          setMatchOptionsOrder([])
+        }
+      }
       resetAnswerInputs()
       setHasCountedAttempt(false)
     })
@@ -182,7 +205,10 @@ export function NetworkingDrillPractice({
       )
     }
 
-    const rightOptions = question.pairs.map((pair) => pair.right)
+    const rightOptions =
+      matchOptionsOrder.length > 0
+        ? matchOptionsOrder
+        : question.pairs.map((pair) => pair.right)
     return (
       <div className="field">
         <label>Match each strategy to the best description:</label>

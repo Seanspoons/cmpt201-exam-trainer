@@ -5,6 +5,7 @@ import { useSessionContext } from '../../components/SessionContext'
 import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
+import { shuffledIndices } from '../../lib/questionRandomize'
 import { gradeByConceptGroups } from '../../lib/semanticGrading'
 import { randomPick } from '../../lib/random'
 import {
@@ -38,7 +39,21 @@ export function ConcurrencyDebugTab() {
 
   const generateQuestion = () => {
     transition.runQuestionTransition(() => {
-      setQuestion(randomPick(CONCURRENCY_QUESTIONS))
+      const rawQuestion = randomPick(CONCURRENCY_QUESTIONS)
+      if (rawQuestion.type === 'mcq') {
+        const order = shuffledIndices(rawQuestion.options.length)
+        const shuffledOptions = order.map((index) => rawQuestion.options[index])
+        const shuffledReasons = order.map((index) => rawQuestion.wrongReasons[index])
+        const shuffledCorrect = order.findIndex((index) => index === rawQuestion.correctOption)
+        setQuestion({
+          ...rawQuestion,
+          options: shuffledOptions,
+          wrongReasons: shuffledReasons,
+          correctOption: shuffledCorrect,
+        })
+      } else {
+        setQuestion(rawQuestion)
+      }
       resetAnswerInputs()
       setHasCountedAttempt(false)
     })

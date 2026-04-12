@@ -5,6 +5,7 @@ import { useSessionContext } from '../../components/SessionContext'
 import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
+import { shuffleChoicesWithCorrectIndex, shuffledIndices } from '../../lib/questionRandomize'
 import type { SchedulingConceptQuestion } from './conceptQuestions'
 
 type SchedulingConceptPracticeProps = {
@@ -24,6 +25,7 @@ export function SchedulingConceptPractice({
   const [question, setQuestion] = useState<SchedulingConceptQuestion | null>(null)
   const [mcqAnswer, setMcqAnswer] = useState<number | null>(null)
   const [matchAnswer, setMatchAnswer] = useState<Record<string, string>>({})
+  const [matchOptionsOrder, setMatchOptionsOrder] = useState<string[]>([])
   const [checked, setChecked] = useState(false)
   const [hasCountedAttempt, setHasCountedAttempt] = useState(false)
   const [result, setResult] = useState<CheckResult | null>(null)
@@ -41,7 +43,24 @@ export function SchedulingConceptPractice({
 
   const generate = () => {
     transition.runQuestionTransition(() => {
-      setQuestion(generateQuestion())
+      const rawQuestion = generateQuestion()
+      if (rawQuestion.type === 'mcq') {
+        const shuffled = shuffleChoicesWithCorrectIndex(
+          rawQuestion.options,
+          rawQuestion.correctOption,
+        )
+        setQuestion({
+          ...rawQuestion,
+          options: shuffled.choices,
+          correctOption: shuffled.correctIndex,
+        })
+        setMatchOptionsOrder([])
+      } else {
+        setQuestion(rawQuestion)
+        const options = rawQuestion.pairs.map((pair) => pair.right)
+        const shuffled = shuffledIndices(options.length).map((index) => options[index])
+        setMatchOptionsOrder(shuffled)
+      }
       resetAnswerInputs()
       setHasCountedAttempt(false)
     })
@@ -164,9 +183,12 @@ export function SchedulingConceptPractice({
                             }
                           >
                             <option value="">Select...</option>
-                            {question.pairs.map((optionPair) => (
-                              <option key={optionPair.right} value={optionPair.right}>
-                                {optionPair.right}
+                            {(matchOptionsOrder.length > 0
+                              ? matchOptionsOrder
+                              : question.pairs.map((optionPair) => optionPair.right)
+                            ).map((option) => (
+                              <option key={option} value={option}>
+                                {option}
                               </option>
                             ))}
                           </select>
