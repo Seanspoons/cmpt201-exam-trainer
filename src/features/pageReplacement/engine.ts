@@ -229,6 +229,7 @@ function solveSecondChance(
         scans.push(
           `Fault: frame ${victimPointer + 1} was empty, inserted page ${page}.`,
         )
+        // Standard clock behavior: after insertion, advance pointer to the next candidate.
         victimPointer = (victimPointer + 1) % frameCount
         break
       }
@@ -240,6 +241,7 @@ function solveSecondChance(
         scans.push(
           `Fault: evicted page ${evictedPage} from frame ${victimPointer + 1} because reference bit was 0.`,
         )
+        // Standard clock behavior: after replacement, continue scanning from next frame.
         victimPointer = (victimPointer + 1) % frameCount
         break
       }
