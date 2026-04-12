@@ -306,16 +306,22 @@
   border: 1px solid transparent;
 }
 
+.answer-feedback-chip svg {
+  transform-origin: center;
+}
+
 .answer-feedback-chip--correct {
   color: #175833;
   border-color: #a9d9b9;
   background: #ebf8f0;
+  animation: feedback-pop 170ms ease-out;
 }
 
 .answer-feedback-chip--partial {
   color: #745914;
   border-color: #e1cf98;
   background: #fff8e4;
+  animation: feedback-pop 170ms ease-out;
 }
 
 .answer-feedback-chip--incorrect {
@@ -542,8 +548,21 @@ button:disabled {
   }
 }
 
+@keyframes feedback-pop {
+  from {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .answer-feedback,
+  .answer-feedback-chip--correct,
+  .answer-feedback-chip--partial,
   .answer-feedback-chip--incorrect {
     animation: none;
   }
