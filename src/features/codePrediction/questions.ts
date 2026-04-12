@@ -2,11 +2,24 @@ export type CodePredictionQuestion = {
   id: string
   prompt: string
   code: string
-  acceptableAnswer: string
-  acceptedPatterns: RegExp[]
-  traceSteps: string[]
+  correctAnswers: string[]
+  explanationSteps: string[]
   concepts: string[]
   nonDeterministicNote?: string
+}
+
+export function normalizePredictionAnswer(raw: string): string {
+  return raw.trim().toLowerCase().replace(/\s+/g, ' ')
+}
+
+export function isPredictionAnswerCorrect(
+  userAnswer: string,
+  question: CodePredictionQuestion,
+): boolean {
+  const actual = normalizePredictionAnswer(userAnswer)
+  return question.correctAnswers
+    .map((answer) => normalizePredictionAnswer(answer))
+    .includes(actual)
 }
 
 export const CODE_PREDICTION_QUESTIONS: CodePredictionQuestion[] = [
@@ -16,70 +29,75 @@ export const CODE_PREDICTION_QUESTIONS: CodePredictionQuestion[] = [
     code: `printf("X\\n");
 fork();
 printf("X\\n");`,
-    acceptableAnswer: '3 times total',
-    acceptedPatterns: [/3/, /three/],
-    traceSteps: [
-      'Before fork, one process prints X once.',
-      'fork() creates parent + child.',
-      'Both processes execute the second printf, adding 2 more prints.',
-      'Total prints: 1 + 2 = 3.',
+    correctAnswers: ['3 times', 'prints 3 times', 'x prints 3 times'],
+    explanationSteps: [
+      'Step 1: Initial process prints X once.',
+      'Step 2: fork() creates one child process.',
+      'Step 3: Both parent and child execute the second printf.',
+      'Step 4: X prints two more times, for 3 total.',
     ],
     concepts: ['fork duplicates process state', 'post-fork code runs in both processes'],
   },
   {
     id: 'exec-replace',
-    prompt: 'What is the bug in this output expectation?',
+    prompt: 'What output behavior is correct for this snippet?',
     code: `printf("A\\n");
 execlp("ls", "ls", NULL);
 printf("B\\n");`,
-    acceptableAnswer: 'Expecting B to print is wrong; exec replaces process image on success',
-    acceptedPatterns: [/exec/, /replace|replaces/, /b/],
-    traceSteps: [
-      'Process prints A.',
-      'execlp succeeds and replaces current program image with ls.',
-      'Control does not return to next line in original code.',
-      'B only prints if exec fails.',
+    correctAnswers: [
+      'B does not print if exec succeeds',
+      'code after successful exec does not run',
+      'exec replaces the process image so B is not printed',
+    ],
+    explanationSteps: [
+      'Step 1: Process prints A.',
+      'Step 2: execlp succeeds and replaces the current process image.',
+      'Step 3: Control does not return to the next line in this program.',
+      'Step 4: B prints only if exec fails.',
     ],
     concepts: ['exec replaces current process', 'code after successful exec is not executed'],
   },
   {
     id: 'pipe-block',
-    prompt: 'Will this parent read potentially block forever?',
+    prompt: 'Will this parent read loop potentially block forever?',
     code: `pipe(fd);
 if (fork() == 0) {
   write(fd[1], "hi", 2);
-  // child exits
 } else {
   char buf[8];
   while (read(fd[0], buf, sizeof(buf)) > 0) { }
 }`,
-    acceptableAnswer:
-      'Yes, it can block if parent/child keep write end open and EOF never arrives',
-    acceptedPatterns: [/yes|can block/, /write end|fd\[1\]|eof/, /close/],
-    traceSteps: [
-      'Reader loop exits only on read returning 0 (EOF).',
-      'EOF requires all write ends of pipe to be closed.',
-      'If a write end remains open in either process, read can wait for more data.',
-      'Close unused fd[1] in parent and fd[0] in child to avoid hangs.',
+    correctAnswers: [
+      'yes, it can block if write ends stay open so eof never arrives',
+      'yes block because all write ends must close for eof',
+      'can block forever unless unused write ends are closed',
+    ],
+    explanationSteps: [
+      'Step 1: read() loop exits only when read returns 0 (EOF).',
+      'Step 2: EOF happens only when every write end of the pipe is closed.',
+      'Step 3: If a write end remains open, read may wait indefinitely.',
+      'Step 4: Close unused ends in each process to avoid hangs.',
     ],
     concepts: ['pipe EOF semantics', 'closing unused descriptors'],
     nonDeterministicNote:
-      'Blocking behavior depends on descriptor-closing order and scheduling.',
+      'Whether it hangs depends on descriptor-closing behavior and scheduling.',
   },
   {
     id: 'read-null-term',
-    prompt: 'What bug can occur in this code?',
+    prompt: 'What bug can occur here?',
     code: `char buf[4];
 int n = read(fd, buf, 4);
 printf("%s\\n", buf);`,
-    acceptableAnswer:
-      'Missing null terminator after read; printf("%s") may read past buffer',
-    acceptedPatterns: [/null|terminator/, /%s|printf/, /past buffer|overflow|garbage/],
-    traceSteps: [
-      'read writes raw bytes and does not append \\0.',
-      'printf("%s") expects a null-terminated C string.',
-      'Without terminator, printing can continue into unrelated memory.',
-      'Fix by reserving space and setting buf[n] = \'\\0\' when safe.',
+    correctAnswers: [
+      'missing null terminator after read',
+      'printf with %s may read past buffer without null terminator',
+      'read does not append null terminator so string output is unsafe',
+    ],
+    explanationSteps: [
+      'Step 1: read() writes raw bytes and does not append \\0.',
+      'Step 2: printf("%s") expects a null-terminated C string.',
+      'Step 3: Without terminator, output may continue into unrelated memory.',
+      'Step 4: Add a terminator when space permits before printing as a string.',
     ],
     concepts: ['read vs C-string conventions', 'memory safety in output'],
   },

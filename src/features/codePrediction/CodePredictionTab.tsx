@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { randomPick } from '../../lib/random'
 import {
   CODE_PREDICTION_QUESTIONS,
+  isPredictionAnswerCorrect,
   type CodePredictionQuestion,
 } from './questions'
 
@@ -26,11 +27,7 @@ export function CodePredictionTab() {
 
   const checkAnswer = () => {
     if (!question) return
-    const normalized = answer.toLowerCase()
-    const hits = question.acceptedPatterns.filter((pattern) =>
-      pattern.test(normalized),
-    )
-    const isCorrect = hits.length >= 2
+    const isCorrect = isPredictionAnswerCorrect(answer, question)
     setResult({ isCorrect })
     setAttempts((value) => value + 1)
     if (isCorrect) {
@@ -76,8 +73,8 @@ export function CodePredictionTab() {
                 {result.isCorrect ? 'Correct' : 'Incorrect'}
               </p>
               <p>
-                Expected answer:{' '}
-                <strong>{question.acceptableAnswer}</strong>
+                Expected answer(s):{' '}
+                <strong>{question.correctAnswers.join(' OR ')}</strong>
               </p>
               <table className="compact-table">
                 <thead>
@@ -86,7 +83,7 @@ export function CodePredictionTab() {
                   </tr>
                 </thead>
                 <tbody>
-                  {question.traceSteps.map((step) => (
+                  {question.explanationSteps.map((step) => (
                     <tr key={step}>
                       <td>{step}</td>
                     </tr>
