@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react'
-import { FiBarChart2, FiNavigation, FiRotateCcw, FiTarget } from 'react-icons/fi'
+import { FiBarChart2, FiRotateCcw, FiTarget } from 'react-icons/fi'
 import { IoFlame } from 'react-icons/io5'
 import { calculateAccuracy, useSessionContext } from './SessionContext'
-import { UNIT_NAVIGATE_EVENT } from '../lib/navigation'
-import type { UnitId } from '../lib/study'
 
 type RankedEntry = {
   label: string
@@ -15,29 +13,6 @@ type RankedEntry = {
 type RankedSubtopicEntry = RankedEntry & {
   unitLabel: string
   subtopicLabel: string
-}
-
-const UNIT_LABEL_TO_ID: Record<string, UnitId> = {
-  'Tour of Computer Systems': 'tour-computer-systems',
-  'sleep()': 'sleep',
-  'fork() and exec()': 'fork-exec',
-  'wait() and errno': 'wait-errno',
-  Signals: 'signals',
-  Scheduling: 'scheduling',
-  'Memory Management': 'memory-management',
-  'Virtual Memory': 'virtual-memory',
-  Threads: 'threads',
-  'Synchronization: Mutex': 'sync-mutex',
-  'Synchronization: Patterns': 'sync-patterns',
-  'File I/O: Calls': 'file-io',
-  'File I/O: File Systems': 'filesystems',
-  'Networking: Sockets': 'networking-sockets',
-  'Networking: AF_INET': 'networking-af-inet',
-  'Networking: Multiple Clients': 'networking-multiple-clients',
-  'IPC: Pipes': 'ipc-pipes',
-  'IPC: Shared Memory': 'ipc-shared-memory',
-  'Cryptography: Algorithms': 'crypto-algorithms',
-  'Cryptography: Applications': 'crypto-applications',
 }
 
 type SessionProgressPanelProps = {
@@ -98,23 +73,6 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
       .slice(0, 2)
   }, [state.bySubtopic])
 
-  const drillWeakestSubtopics = () => {
-    const first = weakestSubtopics[0]
-    if (!first || typeof window === 'undefined') return
-    const unitId = UNIT_LABEL_TO_ID[first.unitLabel]
-    if (!unitId) return
-    window.localStorage.setItem(
-      `cmpt201.nav.subtopic.${first.unitLabel}`,
-      first.subtopicLabel,
-    )
-    window.dispatchEvent(
-      new CustomEvent(UNIT_NAVIGATE_EVENT, {
-        detail: { unitId },
-      }),
-    )
-    setShowReview(false)
-  }
-
   return (
     <section className="session-panel">
       <div className="session-panel-top">
@@ -152,14 +110,6 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
               <span>Exam Mode</span>
             </button>
           ) : null}
-          <button
-            className="button-secondary"
-            onClick={drillWeakestSubtopics}
-            disabled={weakestSubtopics.length === 0}
-          >
-            <FiNavigation aria-hidden="true" />
-            <span>Drill weakest 2 subtopics now</span>
-          </button>
         </div>
       </div>
       {weakestSubtopics.length > 0 ? (
