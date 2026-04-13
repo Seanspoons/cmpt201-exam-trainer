@@ -646,7 +646,7 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
 
                     <div style={{ marginTop: '0.65rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <button
-                        className="button-secondary"
+                        className="button-secondary exam-nav-button"
                         onClick={goBack}
                         disabled={currentIndex === 0 || transition.isTransitioning}
                       >

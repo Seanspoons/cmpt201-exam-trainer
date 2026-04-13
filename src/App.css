@@ -393,6 +393,17 @@
   margin-top: 0.8rem;
 }
 
+.exam-nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.exam-nav-button svg {
+  position: relative;
+  top: 0.5px;
+}
+
 
 .session-review-grid {
   margin-top: 0.72rem;
