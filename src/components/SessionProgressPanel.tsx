@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { FiBarChart2, FiRotateCcw, FiTarget } from 'react-icons/fi'
 import { IoFlame } from 'react-icons/io5'
 import { calculateAccuracy, useSessionContext } from './SessionContext'
+import { useConfirmDialog } from './ConfirmDialogContext'
 
 type RankedEntry = {
   label: string
@@ -25,6 +26,7 @@ type SortDirection = 'asc' | 'desc'
 
 export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelProps) {
   const { state, resetSession } = useSessionContext()
+  const { requestConfirm } = useConfirmDialog()
   const [showReview, setShowReview] = useState(false)
   const [unitSort, setUnitSort] = useState<{
     key: UnitSortKey
@@ -123,6 +125,17 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
     return direction === 'desc' ? ' ↓' : ' ↑'
   }
 
+  const confirmResetSession = async () => {
+    const confirmed = await requestConfirm({
+      title: 'Reset Session Progress?',
+      message: 'This clears current session stats, streaks, and review data.',
+      confirmLabel: 'Reset Session',
+      cancelLabel: 'Keep Progress',
+    })
+    if (!confirmed) return
+    resetSession()
+  }
+
   const weakestSubtopics = useMemo(() => {
     return Object.values(state.bySubtopic)
       .filter((bucket) => bucket.attempted > 0)
@@ -166,7 +179,7 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
             <FiBarChart2 aria-hidden="true" />
             <span>{showReview ? 'Hide Review' : 'Review Session'}</span>
           </button>
-          <button className="button-secondary" onClick={resetSession}>
+          <button className="button-secondary" onClick={confirmResetSession}>
             <FiRotateCcw aria-hidden="true" />
             <span>Reset Session</span>
           </button>
