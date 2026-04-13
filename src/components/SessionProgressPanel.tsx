@@ -19,9 +19,21 @@ type SessionProgressPanelProps = {
   onOpenExamMode?: () => void
 }
 
+type UnitSortKey = 'label' | 'correct' | 'attempted' | 'accuracy'
+type SubtopicSortKey = 'label' | 'correct' | 'attempted' | 'accuracy'
+type SortDirection = 'asc' | 'desc'
+
 export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelProps) {
   const { state, resetSession } = useSessionContext()
   const [showReview, setShowReview] = useState(false)
+  const [unitSort, setUnitSort] = useState<{
+    key: UnitSortKey
+    direction: SortDirection
+  }>({ key: 'attempted', direction: 'desc' })
+  const [subtopicSort, setSubtopicSort] = useState<{
+    key: SubtopicSortKey
+    direction: SortDirection
+  }>({ key: 'attempted', direction: 'desc' })
 
   const overallAccuracy = calculateAccuracy(state.totalCorrect, state.totalQuestionsAttempted)
   const isFreshSession = state.totalQuestionsAttempted === 0
@@ -58,10 +70,58 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
   }, [state.bySubtopic])
   const unitBreakdown = useMemo(() => {
     return [...rankedUnits].sort((a, b) => {
-      if (a.attempted !== b.attempted) return b.attempted - a.attempted
-      return b.accuracy - a.accuracy
+      const modifier = unitSort.direction === 'asc' ? 1 : -1
+      if (unitSort.key === 'label') {
+        return a.label.localeCompare(b.label) * modifier
+      }
+      if (unitSort.key === 'correct') {
+        return (a.correct - b.correct) * modifier
+      }
+      if (unitSort.key === 'attempted') {
+        return (a.attempted - b.attempted) * modifier
+      }
+      return (a.accuracy - b.accuracy) * modifier
     })
-  }, [rankedUnits])
+  }, [rankedUnits, unitSort])
+  const sortedSubtopics = useMemo(() => {
+    return [...rankedSubtopics].sort((a, b) => {
+      const modifier = subtopicSort.direction === 'asc' ? 1 : -1
+      if (subtopicSort.key === 'label') {
+        return a.label.localeCompare(b.label) * modifier
+      }
+      if (subtopicSort.key === 'correct') {
+        return (a.correct - b.correct) * modifier
+      }
+      if (subtopicSort.key === 'attempted') {
+        return (a.attempted - b.attempted) * modifier
+      }
+      return (a.accuracy - b.accuracy) * modifier
+    })
+  }, [rankedSubtopics, subtopicSort])
+
+  const cycleDirection = (current: SortDirection): SortDirection =>
+    current === 'desc' ? 'asc' : 'desc'
+
+  const handleUnitSort = (key: UnitSortKey) => {
+    setUnitSort((current) =>
+      current.key === key
+        ? { key, direction: cycleDirection(current.direction) }
+        : { key, direction: 'desc' },
+    )
+  }
+
+  const handleSubtopicSort = (key: SubtopicSortKey) => {
+    setSubtopicSort((current) =>
+      current.key === key
+        ? { key, direction: cycleDirection(current.direction) }
+        : { key, direction: 'desc' },
+    )
+  }
+
+  const sortMarker = (active: boolean, direction: SortDirection): string => {
+    if (!active) return ''
+    return direction === 'desc' ? ' ↓' : ' ↑'
+  }
 
   const weakestSubtopics = useMemo(() => {
     return Object.values(state.bySubtopic)
@@ -171,10 +231,39 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
                 <table className="compact-table">
                   <thead>
                     <tr>
-                      <th>Unit</th>
-                      <th>Correct</th>
-                      <th>Attempted</th>
-                      <th>Accuracy</th>
+                      <th>
+                        <button
+                          className="table-sort-button"
+                          onClick={() => handleUnitSort('label')}
+                        >
+                          Unit{sortMarker(unitSort.key === 'label', unitSort.direction)}
+                        </button>
+                      </th>
+                      <th>
+                        <button
+                          className="table-sort-button"
+                          onClick={() => handleUnitSort('correct')}
+                        >
+                          Correct{sortMarker(unitSort.key === 'correct', unitSort.direction)}
+                        </button>
+                      </th>
+                      <th>
+                        <button
+                          className="table-sort-button"
+                          onClick={() => handleUnitSort('attempted')}
+                        >
+                          Attempted
+                          {sortMarker(unitSort.key === 'attempted', unitSort.direction)}
+                        </button>
+                      </th>
+                      <th>
+                        <button
+                          className="table-sort-button"
+                          onClick={() => handleUnitSort('accuracy')}
+                        >
+                          Accuracy{sortMarker(unitSort.key === 'accuracy', unitSort.direction)}
+                        </button>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -200,14 +289,45 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
                 <table className="compact-table">
                   <thead>
                     <tr>
-                      <th>Subtopic</th>
-                      <th>Correct</th>
-                      <th>Attempted</th>
-                      <th>Accuracy</th>
+                      <th>
+                        <button
+                          className="table-sort-button"
+                          onClick={() => handleSubtopicSort('label')}
+                        >
+                          Subtopic{sortMarker(subtopicSort.key === 'label', subtopicSort.direction)}
+                        </button>
+                      </th>
+                      <th>
+                        <button
+                          className="table-sort-button"
+                          onClick={() => handleSubtopicSort('correct')}
+                        >
+                          Correct
+                          {sortMarker(subtopicSort.key === 'correct', subtopicSort.direction)}
+                        </button>
+                      </th>
+                      <th>
+                        <button
+                          className="table-sort-button"
+                          onClick={() => handleSubtopicSort('attempted')}
+                        >
+                          Attempted
+                          {sortMarker(subtopicSort.key === 'attempted', subtopicSort.direction)}
+                        </button>
+                      </th>
+                      <th>
+                        <button
+                          className="table-sort-button"
+                          onClick={() => handleSubtopicSort('accuracy')}
+                        >
+                          Accuracy
+                          {sortMarker(subtopicSort.key === 'accuracy', subtopicSort.direction)}
+                        </button>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {rankedSubtopics.map((entry) => (
+                    {sortedSubtopics.map((entry) => (
                       <tr key={entry.label}>
                         <td>{entry.label}</td>
                         <td>{entry.correct}</td>

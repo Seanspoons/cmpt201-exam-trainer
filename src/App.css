@@ -974,6 +974,20 @@ button:disabled {
   color: var(--text);
 }
 
+.table-sort-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.table-sort-button:hover {
+  text-decoration: underline;
+}
+
 .inline-code-block {
   border: 1px solid var(--border);
   background: #f3f7fd;
