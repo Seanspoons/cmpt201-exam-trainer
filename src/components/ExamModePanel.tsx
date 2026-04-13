@@ -478,10 +478,17 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
         <h2 className="session-panel-title">Exam Mode</h2>
         <div className="exam-mode-actions">
           {activeExam ? (
-            <button className="button-secondary" onClick={confirmStopExam}>
-              <FiX aria-hidden="true" />
-              <span>End Exam</span>
-            </button>
+            isExamComplete ? (
+              <button className="button-primary" onClick={stopExam}>
+                <FiPlay aria-hidden="true" />
+                <span>Start New Exam</span>
+              </button>
+            ) : (
+              <button className="button-secondary" onClick={confirmStopExam}>
+                <FiX aria-hidden="true" />
+                <span>End Exam</span>
+              </button>
+            )
           ) : (
             <>
               {onClose ? (
