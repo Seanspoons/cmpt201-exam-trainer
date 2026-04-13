@@ -21,13 +21,17 @@ type ActiveExam = {
   baseCorrect: number
 }
 
+type ExamModePanelProps = {
+  onClose?: () => void
+}
+
 function formatSeconds(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-export function ExamModePanel() {
+export function ExamModePanel({ onClose }: ExamModePanelProps) {
   const { state } = useSessionContext()
   const allUnitIds = useMemo(() => getDefaultExamUnitIds(), [])
   const availableUnitOptions = useMemo(
@@ -97,6 +101,12 @@ export function ExamModePanel() {
       <div className="exam-mode-header">
         <h2 className="session-panel-title">Exam Mode</h2>
         <div className="exam-mode-actions">
+          {onClose ? (
+            <button className="button-secondary" onClick={onClose}>
+              <FiX aria-hidden="true" />
+              <span>Back to Units</span>
+            </button>
+          ) : null}
           <button
             className="button-secondary"
             onClick={() => setShowConfig((value) => !value)}

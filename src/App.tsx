@@ -169,33 +169,6 @@ function App() {
             <p>Exam-style drills across all CMPT 201 lecture units</p>
           </header>
           <SessionProgressPanel onOpenExamMode={() => setIsExamModeOpen(true)} />
-          {isExamModeOpen ? (
-            <div
-              className="exam-mode-overlay"
-              role="presentation"
-              onClick={() => setIsExamModeOpen(false)}
-            >
-              <div
-                className="exam-mode-modal"
-                role="dialog"
-                aria-modal="true"
-                aria-label="Exam Mode"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <div className="exam-mode-modal-head">
-                  <strong>Exam Mode</strong>
-                  <button
-                    className="button-secondary"
-                    onClick={() => setIsExamModeOpen(false)}
-                  >
-                    <FiX aria-hidden="true" />
-                    <span>Close</span>
-                  </button>
-                </div>
-                <ExamModePanel />
-              </div>
-            </div>
-          ) : null}
           <aside
             id="unit-drawer"
             className={`unit-drawer ${isUnitMenuOpen ? 'unit-drawer--open' : ''}`}
@@ -246,7 +219,13 @@ function App() {
               onClick={() => setIsUnitMenuOpen(false)}
             />
           ) : null}
-          <section className="tab-panel">{renderUnit()}</section>
+          <section className="tab-panel">
+            {isExamModeOpen ? (
+              <ExamModePanel onClose={() => setIsExamModeOpen(false)} />
+            ) : (
+              renderUnit()
+            )}
+          </section>
           <footer className="app-footer">
             <p>&copy; {new Date().getFullYear()} Sean Wotherspoon</p>
           </footer>
