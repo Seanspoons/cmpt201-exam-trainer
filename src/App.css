@@ -389,6 +389,10 @@
   flex-wrap: wrap;
 }
 
+.exam-question-area {
+  margin-top: 0.8rem;
+}
+
 
 .session-review-grid {
   margin-top: 0.72rem;
