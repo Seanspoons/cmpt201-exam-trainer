@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FiBarChart2, FiRotateCcw, FiTarget } from 'react-icons/fi'
+import { FiBarChart2, FiNavigation, FiRotateCcw, FiTarget } from 'react-icons/fi'
 import { IoFlame } from 'react-icons/io5'
 import { calculateAccuracy, useSessionContext } from './SessionContext'
 import { UNIT_NAVIGATE_EVENT } from '../lib/navigation'
@@ -157,7 +157,7 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
             onClick={drillWeakestSubtopics}
             disabled={weakestSubtopics.length === 0}
           >
-            <FiBarChart2 aria-hidden="true" />
+            <FiNavigation aria-hidden="true" />
             <span>Drill weakest 2 subtopics now</span>
           </button>
         </div>
