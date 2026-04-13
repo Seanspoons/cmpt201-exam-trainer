@@ -56,6 +56,12 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
       }))
       .sort((a, b) => b.accuracy - a.accuracy)
   }, [state.bySubtopic])
+  const unitBreakdown = useMemo(() => {
+    return [...rankedUnits].sort((a, b) => {
+      if (a.attempted !== b.attempted) return b.attempted - a.attempted
+      return b.accuracy - a.accuracy
+    })
+  }, [rankedUnits])
 
   const weakestSubtopics = useMemo(() => {
     return Object.values(state.bySubtopic)
@@ -154,6 +160,35 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
                   </li>
                 ))}
               </ul>
+            )}
+          </div>
+          <div className="session-review-card session-review-card-wide">
+            <h3>Unit Breakdown</h3>
+            {unitBreakdown.length === 0 ? (
+              <p>No attempts yet.</p>
+            ) : (
+              <div className="table-scroll">
+                <table className="compact-table">
+                  <thead>
+                    <tr>
+                      <th>Unit</th>
+                      <th>Correct</th>
+                      <th>Attempted</th>
+                      <th>Accuracy</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {unitBreakdown.map((entry) => (
+                      <tr key={entry.label}>
+                        <td>{entry.label}</td>
+                        <td>{entry.correct}</td>
+                        <td>{entry.attempted}</td>
+                        <td>{entry.accuracy}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
           <div className="session-review-card session-review-card-wide">
