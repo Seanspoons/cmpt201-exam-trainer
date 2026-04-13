@@ -129,8 +129,10 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
   )
   const targetCountOptions = useMemo(() => {
     const base = [5, 10, 15, 20, 25, 30]
-    return Array.from(new Set([...base, recommendedTargetCount])).sort((a, b) => a - b)
-  }, [recommendedTargetCount])
+    return Array.from(new Set([...base, recommendedTargetCount, targetQuestions])).sort(
+      (a, b) => a - b,
+    )
+  }, [recommendedTargetCount, targetQuestions])
   const recommendedDurationMinutes = useMemo(() => {
     const perQuestionMinutes = 2
     const value = Math.ceil(targetQuestions * perQuestionMinutes)
@@ -140,6 +142,17 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     const base = [10, 15, 20, 30, 45, 60, 75, 90, 120, 150, 180, 240]
     return Array.from(new Set([...base, recommendedDurationMinutes])).sort((a, b) => a - b)
   }, [recommendedDurationMinutes])
+
+  useEffect(() => {
+    if (targetCountOptions.includes(targetQuestions)) return
+    const nearest = targetCountOptions.reduce((best, current) => {
+      if (Math.abs(current - targetQuestions) < Math.abs(best - targetQuestions)) {
+        return current
+      }
+      return best
+    }, targetCountOptions[0] ?? targetQuestions)
+    setTargetQuestions(nearest)
+  }, [targetCountOptions, targetQuestions])
 
   const currentEntry = entries[currentIndex] ?? null
   const attemptedInExam = activeExam ? entries.filter((entry) => entry.submitted).length : 0
