@@ -1,6 +1,5 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
 import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
-import { generateProcessesMixedQuestion } from '../mixedDrills/clusterQuestions'
 import {
   generateExecBasicsQuestion,
   generateExecFlavorsQuestion,
@@ -16,17 +15,6 @@ export function ForkExecUnit() {
     <UnitScaffold
       unitLabel="fork() and exec()"
       subtopics={[
-        {
-          id: 'processes-final-exam-mixed',
-          label: 'Final Exam Mixed Drill (Processes)',
-          render: () => (
-            <NetworkingDrillPractice
-              key="fork-exec-processes-mixed"
-              title="Processes > Final Exam Mixed Drill"
-              generateQuestion={generateProcessesMixedQuestion}
-            />
-          ),
-        },
         {
           id: 'fork-basics',
           label: 'fork() Basics',

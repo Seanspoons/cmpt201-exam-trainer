@@ -21,6 +21,7 @@ import { TourSystemsUnit } from './features/tourSystems/TourSystemsUnit'
 import { VirtualMemoryUnit } from './features/virtualMemory/VirtualMemoryUnit'
 import { WaitErrnoUnit } from './features/waitErrno/WaitErrnoUnit'
 import { SessionProgressPanel } from './components/SessionProgressPanel'
+import { ExamModePanel } from './components/ExamModePanel'
 import { SessionProvider } from './components/SessionContext'
 import { ConfirmDialogProvider } from './components/ConfirmDialogContext'
 import { UNIT_OPTIONS, type UnitId } from './lib/study'
@@ -167,6 +168,7 @@ function App() {
             <p>Exam-style drills across all CMPT 201 lecture units</p>
           </header>
           <SessionProgressPanel />
+          <ExamModePanel />
           <aside
             id="unit-drawer"
             className={`unit-drawer ${isUnitMenuOpen ? 'unit-drawer--open' : ''}`}
