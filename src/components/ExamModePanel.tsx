@@ -5,6 +5,7 @@ import { UNIT_OPTIONS } from '../lib/study'
 import {
   generateExamModeQuestion,
   getDefaultExamUnitIds,
+  getExamRecommendedTargetQuestionCount,
 } from '../lib/examModeQuestions'
 import type { NetworkingQuestion } from '../features/networkingShared/networkingDrills'
 import { calculateAccuracy } from './SessionContext'
@@ -122,6 +123,14 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
   const lastQuestionIdRef = useRef<string | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
+  const recommendedTargetCount = useMemo(
+    () => getExamRecommendedTargetQuestionCount(selectedUnits),
+    [selectedUnits],
+  )
+  const targetCountOptions = useMemo(() => {
+    const base = [5, 10, 15, 20, 25, 30]
+    return Array.from(new Set([...base, recommendedTargetCount])).sort((a, b) => a - b)
+  }, [recommendedTargetCount])
 
   const currentEntry = entries[currentIndex] ?? null
   const attemptedInExam = activeExam ? entries.filter((entry) => entry.submitted).length : 0
@@ -547,9 +556,11 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                 value={targetQuestions}
                 onChange={(event) => setTargetQuestions(Number(event.target.value))}
               >
-                {[5, 10, 15, 20, 25, 30].map((count) => (
+                {targetCountOptions.map((count) => (
                   <option key={count} value={count}>
-                    {count}
+                    {count === recommendedTargetCount
+                      ? `Max Coverage+ (${count})`
+                      : count}
                   </option>
                 ))}
               </select>

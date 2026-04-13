@@ -398,3 +398,25 @@ export function generateExamModeQuestion(
   if (unitPool.length === 0) return null
   return randomPick(unitPool)()
 }
+
+const PROCEDURAL_HEAVY_UNITS = new Set<UnitId>([
+  'fork-exec',
+  'memory-management',
+  'virtual-memory',
+  'scheduling',
+  'ipc-pipes',
+])
+
+export function getExamRecommendedTargetQuestionCount(unitIds: UnitId[]): number {
+  const selected = unitIds.length > 0 ? unitIds : getDefaultExamUnitIds()
+  const baseQuestionCount = selected.reduce((sum, unitId) => {
+    const generators = EXAM_GENERATORS_BY_UNIT[unitId] ?? []
+    return sum + generators.length
+  }, 0)
+
+  const proceduralUnitCount = selected.filter((unitId) =>
+    PROCEDURAL_HEAVY_UNITS.has(unitId),
+  ).length
+  const proceduralBuffer = Math.min(20, Math.max(8, proceduralUnitCount * 3))
+  return baseQuestionCount + proceduralBuffer
+}
