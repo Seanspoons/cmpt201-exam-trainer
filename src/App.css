@@ -478,6 +478,36 @@
   color: var(--text);
 }
 
+.topic-path-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.topic-path-unit {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #34557f;
+  background: #e8f0fb;
+  border: 1px solid #c5d6ee;
+  border-radius: 999px;
+  padding: 0.14rem 0.55rem;
+}
+
+.topic-path-divider {
+  color: #6a7f9a;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.topic-path-subtopic {
+  color: #1a3559;
+  font-weight: 700;
+}
+
 .tab-nav {
   border-radius: 12px;
 }

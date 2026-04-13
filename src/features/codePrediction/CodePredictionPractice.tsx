@@ -3,6 +3,7 @@ import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { useConfirmDialog } from '../../components/ConfirmDialogContext'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
 import { useSessionContext } from '../../components/SessionContext'
+import { TopicPathTitle } from '../../components/TopicPathTitle'
 import { useTopicContext } from '../../components/TopicContext'
 import { useUnitNavigationContext } from '../../components/UnitNavigationContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
@@ -120,7 +121,7 @@ export function CodePredictionPractice({
 
   return (
     <div>
-      <h3 className="section-title">{title}</h3>
+      <TopicPathTitle title={title} />
       <QuestionControlBar
         hasQuestion={Boolean(question)}
         isTransitioning={transition.isTransitioning}

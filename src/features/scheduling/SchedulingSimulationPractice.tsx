@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { AnswerFeedbackCard } from '../../components/AnswerFeedbackCard'
 import { QuestionControlBar } from '../../components/QuestionControlBar'
 import { useSessionContext } from '../../components/SessionContext'
+import { TopicPathTitle } from '../../components/TopicPathTitle'
 import { useTopicContext } from '../../components/TopicContext'
 import { useQuestionTransition } from '../../components/useQuestionTransition'
 import { useResetPulse } from '../../components/useResetPulse'
@@ -166,7 +167,7 @@ export function SchedulingSimulationPractice({
 
   return (
     <div>
-      <h3 className="section-title">{title}</h3>
+      <TopicPathTitle title={title} />
       <div className="nested-choice-panel nested-choice-panel--scheduling">
         <p className="nested-choice-label">Scheduling Algorithm</p>
         <div className="nested-choice-row" role="tablist" aria-label="Scheduling algorithm">
