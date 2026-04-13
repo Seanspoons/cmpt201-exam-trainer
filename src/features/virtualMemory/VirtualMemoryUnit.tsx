@@ -1,5 +1,6 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
 import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
+import { generateVirtualMemoryMixedQuestion } from '../mixedDrills/clusterQuestions'
 import { AddressTranslationTab } from '../addressTranslation/AddressTranslationTab'
 import { PageReplacementTab } from '../pageReplacement/PageReplacementTab'
 import {
@@ -31,6 +32,17 @@ export function VirtualMemoryUnit() {
       unitLabel="Virtual Memory"
       defaultSubtopicId="page-replacement"
       subtopics={[
+        {
+          id: 'vm-final-exam-mixed',
+          label: 'Final Exam Mixed Drill (Virtual Memory)',
+          render: () => (
+            <NetworkingDrillPractice
+              key="vm-final-exam-mixed"
+              title="Virtual Memory > Final Exam Mixed Drill"
+              generateQuestion={generateVirtualMemoryMixedQuestion}
+            />
+          ),
+        },
         {
           id: 'address-translation',
           label: 'Address Translation',

@@ -1,5 +1,6 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
 import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
+import { generateIpcNetworkingMixedQuestion } from '../mixedDrills/clusterQuestions'
 import {
   generateSocketsRoleQuestion,
   generateSocketsStackBasicsQuestion,
@@ -12,6 +13,17 @@ export function NetworkingSocketsUnit() {
     <UnitScaffold
       unitLabel="Networking: Sockets"
       subtopics={[
+        {
+          id: 'ipc-networking-final-exam-mixed',
+          label: 'Final Exam Mixed Drill (IPC + Networking)',
+          render: () => (
+            <NetworkingDrillPractice
+              key="ipc-networking-final-exam-mixed"
+              title="IPC + Networking > Final Exam Mixed Drill"
+              generateQuestion={generateIpcNetworkingMixedQuestion}
+            />
+          ),
+        },
         {
           id: 'stack-basics',
           label: 'Networking Stack Basics',

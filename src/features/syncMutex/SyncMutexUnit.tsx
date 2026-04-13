@@ -1,5 +1,6 @@
 import { UnitScaffold } from '../../components/UnitScaffold'
 import { NetworkingDrillPractice } from '../networkingShared/networkingDrills'
+import { generateSynchronizationMixedQuestion } from '../mixedDrills/clusterQuestions'
 import {
   generateCriticalAtomicityQuestion,
   generateDeadlockPreventionQuestion,
@@ -16,6 +17,17 @@ export function SyncMutexUnit() {
     <UnitScaffold
       unitLabel="Synchronization: Mutex"
       subtopics={[
+        {
+          id: 'sync-final-exam-mixed',
+          label: 'Final Exam Mixed Drill (Synchronization)',
+          render: () => (
+            <NetworkingDrillPractice
+              key="sync-final-exam-mixed"
+              title="Synchronization > Final Exam Mixed Drill"
+              generateQuestion={generateSynchronizationMixedQuestion}
+            />
+          ),
+        },
         {
           id: 'sync-basics',
           label: 'Synchronization Basics',
