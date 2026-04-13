@@ -43,6 +43,7 @@ function App() {
   const brandWordmarkSrc = `${import.meta.env.BASE_URL}cmpt-201-exam-trainer-wordmark.svg`
   const [activeUnit, setActiveUnit] = useState<UnitId>(() => loadActiveUnit())
   const [isUnitMenuOpen, setIsUnitMenuOpen] = useState(false)
+  const [isExamModeOpen, setIsExamModeOpen] = useState(false)
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
 
   const selectUnit = (unitId: UnitId) => {
@@ -167,8 +168,34 @@ function App() {
             <h1 className="visually-hidden">CMPT 201 Exam Trainer</h1>
             <p>Exam-style drills across all CMPT 201 lecture units</p>
           </header>
-          <SessionProgressPanel />
-          <ExamModePanel />
+          <SessionProgressPanel onOpenExamMode={() => setIsExamModeOpen(true)} />
+          {isExamModeOpen ? (
+            <div
+              className="exam-mode-overlay"
+              role="presentation"
+              onClick={() => setIsExamModeOpen(false)}
+            >
+              <div
+                className="exam-mode-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Exam Mode"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="exam-mode-modal-head">
+                  <strong>Exam Mode</strong>
+                  <button
+                    className="button-secondary"
+                    onClick={() => setIsExamModeOpen(false)}
+                  >
+                    <FiX aria-hidden="true" />
+                    <span>Close</span>
+                  </button>
+                </div>
+                <ExamModePanel />
+              </div>
+            </div>
+          ) : null}
           <aside
             id="unit-drawer"
             className={`unit-drawer ${isUnitMenuOpen ? 'unit-drawer--open' : ''}`}
