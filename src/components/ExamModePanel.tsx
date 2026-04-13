@@ -128,10 +128,6 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
   const correctInExam = activeExam
     ? entries.filter((entry) => entry.submitted && entry.status === 'correct').length
     : 0
-  const gradedAttemptCount = entries.filter(
-    (entry) => entry.submitted && (entry.status === 'correct' || entry.status === 'incorrect'),
-  ).length
-  const accuracyInExam = calculateAccuracy(correctInExam, gradedAttemptCount)
   const remainingQuestions = activeExam
     ? Math.max(0, activeExam.targetQuestions - attemptedInExam)
     : 0
@@ -630,10 +626,6 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                 </p>
                 <p>
                   Completed in <strong>{formatSeconds(examDurationSeconds)}</strong>.
-                </p>
-                <p>
-                  Final result: <strong>{correctInExam}</strong> correct out of{' '}
-                  <strong>{attemptedInExam}</strong> attempted ({accuracyInExam}%).
                 </p>
                 <p>
                   Exam score: <strong>{correctInExam}</strong> /{' '}
