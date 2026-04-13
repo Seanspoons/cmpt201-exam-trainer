@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { FiClock, FiPlay, FiTarget, FiX, FiArrowLeft } from 'react-icons/fi'
+import { FiClock, FiPlay, FiX, FiArrowLeft } from 'react-icons/fi'
 import type { UnitId } from '../lib/study'
 import { UNIT_OPTIONS } from '../lib/study'
 import {
@@ -108,7 +108,6 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
       })),
     [allUnitIds],
   )
-  const [showConfig, setShowConfig] = useState(true)
   const [selectedUnits, setSelectedUnits] = useState<UnitId[]>(allUnitIds)
   const [timed, setTimed] = useState(true)
   const [durationMinutes, setDurationMinutes] = useState(20)
@@ -223,7 +222,6 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     setEntries([createExamEntry(firstQuestion)])
     setCurrentIndex(0)
     setCompletedAtMs(null)
-    setShowConfig(false)
   }
 
   const stopExam = () => {
@@ -233,7 +231,6 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     setCompletedAtMs(null)
     seenQuestionIdsRef.current.clear()
     lastQuestionIdRef.current = null
-    setShowConfig(true)
   }
 
   const confirmStopExam = async () => {
@@ -466,13 +463,6 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                 </button>
               ) : null}
               <button
-                className="button-secondary"
-                onClick={() => setShowConfig((value) => !value)}
-              >
-                <FiTarget aria-hidden="true" />
-                <span>{showConfig ? 'Hide Setup' : 'Setup Exam'}</span>
-              </button>
-              <button
                 className="button-primary"
                 onClick={startExam}
                 disabled={selectedUnits.length === 0}
@@ -485,7 +475,7 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
         </div>
       </div>
 
-      {!activeExam && showConfig ? (
+      {!activeExam ? (
         <div className="exam-mode-config">
           <div className="exam-mode-row">
             <div className="toggle-switch-group">

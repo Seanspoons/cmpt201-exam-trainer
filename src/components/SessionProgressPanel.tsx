@@ -149,7 +149,7 @@ export function SessionProgressPanel({ onOpenExamMode }: SessionProgressPanelPro
           {onOpenExamMode ? (
             <button className="button-secondary" onClick={onOpenExamMode}>
               <FiTarget aria-hidden="true" />
-              <span>Setup Exam</span>
+              <span>Exam Mode</span>
             </button>
           ) : null}
           <button
