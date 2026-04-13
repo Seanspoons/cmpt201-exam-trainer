@@ -502,16 +502,6 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
               <strong>{activeExam.targetQuestions}</strong>
             </p>
             <p>
-              Correct:{' '}
-              {isExamComplete ? (
-                <strong>
-                  {correctInExam} ({accuracyInExam}%)
-                </strong>
-              ) : (
-                <strong>Hidden until review</strong>
-              )}
-            </p>
-            <p>
               Remaining questions: <strong>{remainingQuestions}</strong>
             </p>
             {activeExam.timed ? (
@@ -522,6 +512,11 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
             ) : (
               <p>Untimed exam mode is active.</p>
             )}
+            {isExamComplete ? (
+              <p>
+                Score: <strong>{correctInExam}</strong> correct ({accuracyInExam}%)
+              </p>
+            ) : null}
           </div>
 
           {isExamComplete ? (
