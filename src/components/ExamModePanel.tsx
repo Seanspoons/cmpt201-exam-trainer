@@ -38,6 +38,7 @@ export function ExamModePanel() {
       })),
     [allUnitIds],
   )
+  const [isExpanded, setIsExpanded] = useState(false)
   const [showConfig, setShowConfig] = useState(false)
   const [selectedUnits, setSelectedUnits] = useState<UnitId[]>(allUnitIds)
   const [timed, setTimed] = useState(true)
@@ -53,6 +54,12 @@ export function ExamModePanel() {
     }, 1000)
     return () => window.clearInterval(id)
   }, [activeExam?.timed])
+
+  useEffect(() => {
+    if (activeExam) {
+      setIsExpanded(true)
+    }
+  }, [activeExam])
 
   const attemptedInExam = activeExam
     ? Math.max(0, state.totalQuestionsAttempted - activeExam.baseAttempted)
@@ -92,13 +99,34 @@ export function ExamModePanel() {
     setActiveExam(null)
   }
 
+  const shouldShowBody = isExpanded || Boolean(activeExam)
+
   return (
-    <section className="exam-mode-panel">
+    <section
+      className={`exam-mode-panel ${
+        shouldShowBody ? 'exam-mode-panel--expanded' : 'exam-mode-panel--collapsed'
+      }`}
+    >
       <div className="exam-mode-header">
         <h2 className="session-panel-title">Exam Mode</h2>
         <div className="exam-mode-actions">
+          {!activeExam ? (
+            <button
+              className="button-secondary"
+              onClick={() => {
+                setIsExpanded((value) => !value)
+                if (isExpanded) {
+                  setShowConfig(false)
+                }
+              }}
+            >
+              <FiTarget aria-hidden="true" />
+              <span>{shouldShowBody ? 'Hide Exam Mode' : 'Open Exam Mode'}</span>
+            </button>
+          ) : null}
           <button
             className="button-secondary"
+            disabled={!shouldShowBody}
             onClick={() => setShowConfig((value) => !value)}
           >
             <FiTarget aria-hidden="true" />
@@ -122,31 +150,43 @@ export function ExamModePanel() {
         </div>
       </div>
 
-      {showConfig ? (
+      {!shouldShowBody ? (
+        <p className="small-note">
+          Hidden until needed. Open Exam Mode when you want a timed or targeted mixed-unit run.
+        </p>
+      ) : null}
+
+      {shouldShowBody && showConfig ? (
         <div className="exam-mode-config">
           <div className="exam-mode-row">
-            <label className="inline-control">
-              <input
-                type="checkbox"
-                checked={timed}
-                onChange={(event) => setTimed(event.target.checked)}
-              />
-              <span>Timed exam</span>
-            </label>
-            <label className="inline-control">
-              <span>Time</span>
-              <select
-                value={durationMinutes}
-                onChange={(event) => setDurationMinutes(Number(event.target.value))}
-                disabled={!timed}
+            <div className="toggle-switch-group">
+              <button
+                type="button"
+                className={`toggle-switch ${timed ? 'toggle-switch--on' : ''}`}
+                role="switch"
+                aria-checked={timed}
+                aria-label="Timed exam mode"
+                onClick={() => setTimed((value) => !value)}
               >
-                {[10, 15, 20, 30, 45, 60].map((minutes) => (
-                  <option key={minutes} value={minutes}>
-                    {minutes} min
-                  </option>
-                ))}
-              </select>
-            </label>
+                <span className="toggle-switch-knob" />
+              </button>
+              <span>Timed exam</span>
+            </div>
+            {timed ? (
+              <label className="inline-control">
+                <span>Time</span>
+                <select
+                  value={durationMinutes}
+                  onChange={(event) => setDurationMinutes(Number(event.target.value))}
+                >
+                  {[10, 15, 20, 30, 45, 60].map((minutes) => (
+                    <option key={minutes} value={minutes}>
+                      {minutes} min
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
             <label className="inline-control">
               <span>Question target</span>
               <select
@@ -200,7 +240,7 @@ export function ExamModePanel() {
         </div>
       ) : null}
 
-      {activeExam ? (
+      {shouldShowBody && activeExam ? (
         <>
           <div className="exam-mode-status">
             <p>
@@ -255,11 +295,11 @@ export function ExamModePanel() {
             />
           )}
         </>
-      ) : (
+      ) : shouldShowBody ? (
         <p className="small-note">
           Start Exam Mode to drill mixed questions across selected units with optional timer and target count.
         </p>
-      )}
+      ) : null}
     </section>
   )
 }
