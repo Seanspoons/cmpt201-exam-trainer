@@ -131,6 +131,15 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     const base = [5, 10, 15, 20, 25, 30]
     return Array.from(new Set([...base, recommendedTargetCount])).sort((a, b) => a - b)
   }, [recommendedTargetCount])
+  const recommendedDurationMinutes = useMemo(() => {
+    const perQuestionMinutes = 2
+    const value = Math.ceil(targetQuestions * perQuestionMinutes)
+    return Math.max(20, Math.min(240, value))
+  }, [targetQuestions])
+  const durationOptions = useMemo(() => {
+    const base = [10, 15, 20, 30, 45, 60, 75, 90, 120, 150, 180, 240]
+    return Array.from(new Set([...base, recommendedDurationMinutes])).sort((a, b) => a - b)
+  }, [recommendedDurationMinutes])
 
   const currentEntry = entries[currentIndex] ?? null
   const attemptedInExam = activeExam ? entries.filter((entry) => entry.submitted).length : 0
@@ -542,9 +551,11 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                   value={durationMinutes}
                   onChange={(event) => setDurationMinutes(Number(event.target.value))}
                 >
-                  {[10, 15, 20, 30, 45, 60].map((minutes) => (
+                  {durationOptions.map((minutes) => (
                     <option key={minutes} value={minutes}>
-                      {minutes} min
+                      {minutes === recommendedDurationMinutes
+                        ? `Recommended (${minutes} min)`
+                        : `${minutes} min`}
                     </option>
                   ))}
                 </select>
