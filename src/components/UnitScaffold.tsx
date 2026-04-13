@@ -40,8 +40,11 @@ export function UnitScaffold({
   const initial = (() => {
     if (typeof window !== 'undefined') {
       const saved = window.localStorage.getItem(storageKeyForUnit(unitLabel))
-      if (saved && subtopics.some((subtopic) => subtopic.id === saved)) {
-        return saved as SubtopicId
+      if (saved) {
+        const byId = subtopics.find((subtopic) => subtopic.id === saved)
+        if (byId) return byId.id
+        const byLabel = subtopics.find((subtopic) => subtopic.label === saved)
+        if (byLabel) return byLabel.id
       }
     }
     return defaultSubtopicId ?? subtopics[0]?.id ?? 'overview'

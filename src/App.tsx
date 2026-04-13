@@ -24,6 +24,7 @@ import { SessionProgressPanel } from './components/SessionProgressPanel'
 import { SessionProvider } from './components/SessionContext'
 import { ConfirmDialogProvider } from './components/ConfirmDialogContext'
 import { UNIT_OPTIONS, type UnitId } from './lib/study'
+import { UNIT_NAVIGATE_EVENT } from './lib/navigation'
 import './App.css'
 
 const ACTIVE_UNIT_STORAGE_KEY = 'cmpt201.nav.activeUnit.v1'
@@ -52,6 +53,22 @@ function App() {
     if (typeof window === 'undefined') return
     window.localStorage.setItem(ACTIVE_UNIT_STORAGE_KEY, activeUnit)
   }, [activeUnit])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const handler = (event: Event) => {
+      const customEvent = event as CustomEvent<{ unitId?: UnitId }>
+      const unitId = customEvent.detail?.unitId
+      if (!unitId) return
+      const isKnown = UNIT_OPTIONS.some((option) => option.id === unitId)
+      if (!isKnown) return
+      setActiveUnit(unitId)
+      setIsUnitMenuOpen(false)
+    }
+    window.addEventListener(UNIT_NAVIGATE_EVENT, handler as EventListener)
+    return () =>
+      window.removeEventListener(UNIT_NAVIGATE_EVENT, handler as EventListener)
+  }, [])
 
   const renderUnit = () => {
     switch (activeUnit) {

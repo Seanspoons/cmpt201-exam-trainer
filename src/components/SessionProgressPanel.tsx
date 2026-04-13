@@ -2,12 +2,42 @@ import { useMemo, useState } from 'react'
 import { FiBarChart2, FiRotateCcw } from 'react-icons/fi'
 import { IoFlame } from 'react-icons/io5'
 import { calculateAccuracy, useSessionContext } from './SessionContext'
+import { UNIT_NAVIGATE_EVENT } from '../lib/navigation'
+import type { UnitId } from '../lib/study'
 
 type RankedEntry = {
   label: string
   attempted: number
   correct: number
   accuracy: number
+}
+
+type RankedSubtopicEntry = RankedEntry & {
+  unitLabel: string
+  subtopicLabel: string
+}
+
+const UNIT_LABEL_TO_ID: Record<string, UnitId> = {
+  'Tour of Computer Systems': 'tour-computer-systems',
+  'sleep()': 'sleep',
+  'fork() and exec()': 'fork-exec',
+  'wait() and errno': 'wait-errno',
+  Signals: 'signals',
+  Scheduling: 'scheduling',
+  'Memory Management': 'memory-management',
+  'Virtual Memory': 'virtual-memory',
+  Threads: 'threads',
+  'Synchronization: Mutex': 'sync-mutex',
+  'Synchronization: Patterns': 'sync-patterns',
+  'File I/O: Calls': 'file-io',
+  'File I/O: File Systems': 'filesystems',
+  'Networking: Sockets': 'networking-sockets',
+  'Networking: AF_INET': 'networking-af-inet',
+  'Networking: Multiple Clients': 'networking-multiple-clients',
+  'IPC: Pipes': 'ipc-pipes',
+  'IPC: Shared Memory': 'ipc-shared-memory',
+  'Cryptography: Algorithms': 'crypto-algorithms',
+  'Cryptography: Applications': 'crypto-applications',
 }
 
 export function SessionProgressPanel() {
@@ -35,9 +65,11 @@ export function SessionProgressPanel() {
     .filter((entry) => !strongLabels.has(entry.label))
     .slice(0, 3)
 
-  const rankedSubtopics = useMemo(() => {
+  const rankedSubtopics = useMemo<RankedSubtopicEntry[]>(() => {
     return Object.values(state.bySubtopic)
       .map((bucket) => ({
+        unitLabel: bucket.unitLabel,
+        subtopicLabel: bucket.subtopicLabel,
         label: `${bucket.unitLabel} > ${bucket.subtopicLabel}`,
         attempted: bucket.attempted,
         correct: bucket.correct,
@@ -45,6 +77,39 @@ export function SessionProgressPanel() {
       }))
       .sort((a, b) => b.accuracy - a.accuracy)
   }, [state.bySubtopic])
+
+  const weakestSubtopics = useMemo(() => {
+    return Object.values(state.bySubtopic)
+      .filter((bucket) => bucket.attempted > 0)
+      .map((bucket) => ({
+        unitLabel: bucket.unitLabel,
+        subtopicLabel: bucket.subtopicLabel,
+        attempted: bucket.attempted,
+        accuracy: calculateAccuracy(bucket.correct, bucket.attempted),
+      }))
+      .sort((a, b) => {
+        if (a.accuracy !== b.accuracy) return a.accuracy - b.accuracy
+        return b.attempted - a.attempted
+      })
+      .slice(0, 2)
+  }, [state.bySubtopic])
+
+  const drillWeakestSubtopics = () => {
+    const first = weakestSubtopics[0]
+    if (!first || typeof window === 'undefined') return
+    const unitId = UNIT_LABEL_TO_ID[first.unitLabel]
+    if (!unitId) return
+    window.localStorage.setItem(
+      `cmpt201.nav.subtopic.${first.unitLabel}`,
+      first.subtopicLabel,
+    )
+    window.dispatchEvent(
+      new CustomEvent(UNIT_NAVIGATE_EVENT, {
+        detail: { unitId },
+      }),
+    )
+    setShowReview(false)
+  }
 
   return (
     <section className="session-panel">
@@ -77,8 +142,21 @@ export function SessionProgressPanel() {
             <FiRotateCcw aria-hidden="true" />
             <span>Reset Session</span>
           </button>
+          <button
+            className="button-secondary"
+            onClick={drillWeakestSubtopics}
+            disabled={weakestSubtopics.length === 0}
+          >
+            <FiBarChart2 aria-hidden="true" />
+            <span>Drill weakest 2 subtopics now</span>
+          </button>
         </div>
       </div>
+      {weakestSubtopics.length > 0 ? (
+        <p className="small-note">
+          Weak targets: {weakestSubtopics.map((entry) => `${entry.unitLabel} > ${entry.subtopicLabel}`).join('  |  ')}
+        </p>
+      ) : null}
 
       {showReview ? (
         <div className="session-review-grid">
