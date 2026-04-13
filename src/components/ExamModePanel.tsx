@@ -152,6 +152,12 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     activeExam && completedAtMs
       ? Math.max(0, Math.floor((completedAtMs - activeExam.startedAtMs) / 1000))
       : 0
+  const scoreOutOfTarget = activeExam
+    ? calculateAccuracy(correctInExam, activeExam.targetQuestions)
+    : 0
+  const unattemptedCount = activeExam
+    ? Math.max(0, activeExam.targetQuestions - attemptedInExam)
+    : 0
 
   useEffect(() => {
     if (!activeExam?.timed || isExamComplete) return
@@ -252,6 +258,23 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     if (!confirmed) return
     setEndedManually(true)
     setCompletedAtMs(Date.now())
+  }
+
+  const overrideTextEntryAsCorrect = (entryIndex: number) => {
+    setEntries((prev) => {
+      if (!prev[entryIndex]) return prev
+      const target = prev[entryIndex]
+      if (!target.submitted || target.question.kind !== 'text' || target.status === 'correct') {
+        return prev
+      }
+      const next = [...prev]
+      next[entryIndex] = {
+        ...target,
+        status: 'correct',
+        missingConceptLabels: [],
+      }
+      return next
+    })
   }
 
   const updateCurrentEntry = (
@@ -567,33 +590,32 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
 
       {activeExam ? (
         <>
-          <div className="exam-mode-status">
-            <p>
-              Attempted: <strong>{attemptedInExam}</strong> / <strong>{activeExam.targetQuestions}</strong>
-            </p>
-            <p>
-              Correct:{' '}
-              <strong>
-                {isExamComplete ? `${correctInExam} (${accuracyInExam}%)` : 'Hidden until review'}
-              </strong>
-            </p>
-            <p>
-              Remaining questions: <strong>{remainingQuestions}</strong>
-            </p>
-            {activeExam.timed ? (
+          {!isExamComplete ? (
+            <div className="exam-mode-status">
               <p>
-                <FiClock aria-hidden="true" /> Time left:{' '}
-                <strong>{formatSeconds(secondsRemaining ?? 0)}</strong>
+                Attempted: <strong>{attemptedInExam}</strong> / <strong>{activeExam.targetQuestions}</strong>
               </p>
-            ) : (
-              <p>Untimed exam mode is active.</p>
-            )}
-            {isFiveMinuteWarning ? (
-              <p className="exam-time-warning" role="status" aria-live="polite">
-                <FiClock aria-hidden="true" /> 5-minute warning: keep moving.
+              <p>
+                Correct: <strong>Hidden until review</strong>
               </p>
-            ) : null}
-          </div>
+              <p>
+                Remaining questions: <strong>{remainingQuestions}</strong>
+              </p>
+              {activeExam.timed ? (
+                <p>
+                  <FiClock aria-hidden="true" /> Time left:{' '}
+                  <strong>{formatSeconds(secondsRemaining ?? 0)}</strong>
+                </p>
+              ) : (
+                <p>Untimed exam mode is active.</p>
+              )}
+              {isFiveMinuteWarning ? (
+                <p className="exam-time-warning" role="status" aria-live="polite">
+                  <FiClock aria-hidden="true" /> 5-minute warning: keep moving.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
 
           {isExamComplete ? (
             <div className="exam-mode-complete">
@@ -613,6 +635,13 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                   Final result: <strong>{correctInExam}</strong> correct out of{' '}
                   <strong>{attemptedInExam}</strong> attempted ({accuracyInExam}%).
                 </p>
+                <p>
+                  Exam score: <strong>{correctInExam}</strong> /{' '}
+                  <strong>{activeExam.targetQuestions}</strong> ({scoreOutOfTarget}%).
+                </p>
+                <p>
+                  Unattempted questions: <strong>{unattemptedCount}</strong>
+                </p>
                 <p className="small-note">Review each question below, then start another exam when ready.</p>
               </div>
 
@@ -626,13 +655,15 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                         <th>Your Answer</th>
                         <th>Expected</th>
                         <th>Result</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {entries
-                        .filter((entry) => entry.submitted)
-                        .map((entry, index) => (
-                          <tr key={`${entry.question.id}-${index}`}>
+                        .map((entry, entryIndex) => ({ entry, entryIndex }))
+                        .filter(({ entry }) => entry.submitted)
+                        .map(({ entry, entryIndex }, index) => (
+                          <tr key={`${entry.question.id}-${entryIndex}`}>
                             <td>{index + 1}</td>
                             <td>{entry.question.prompt}</td>
                             <td>{entry.userAnswerDisplay}</td>
@@ -643,6 +674,18 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                                 : entry.status === 'partial'
                                   ? 'Partial'
                                   : 'Incorrect'}
+                            </td>
+                            <td>
+                              {entry.question.kind === 'text' && entry.status !== 'correct' ? (
+                                <button
+                                  className="button-secondary"
+                                  onClick={() => overrideTextEntryAsCorrect(entryIndex)}
+                                >
+                                  Mark Correct
+                                </button>
+                              ) : (
+                                <span className="small-note">-</span>
+                              )}
                             </td>
                           </tr>
                         ))}
