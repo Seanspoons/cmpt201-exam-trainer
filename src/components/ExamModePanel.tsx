@@ -113,6 +113,7 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
   const [timed, setTimed] = useState(true)
   const [durationMinutes, setDurationMinutes] = useState(20)
   const [targetQuestions, setTargetQuestions] = useState(15)
+  const [isFollowingMaxCoverage, setIsFollowingMaxCoverage] = useState(false)
   const [activeExam, setActiveExam] = useState<ActiveExam | null>(null)
   const [nowMs, setNowMs] = useState(() => Date.now())
   const [completedAtMs, setCompletedAtMs] = useState<number | null>(null)
@@ -153,6 +154,12 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     }, targetCountOptions[0] ?? targetQuestions)
     setTargetQuestions(nearest)
   }, [targetCountOptions, targetQuestions])
+
+  useEffect(() => {
+    if (!isFollowingMaxCoverage) return
+    if (targetQuestions === recommendedTargetCount) return
+    setTargetQuestions(recommendedTargetCount)
+  }, [isFollowingMaxCoverage, recommendedTargetCount, targetQuestions])
 
   const currentEntry = entries[currentIndex] ?? null
   const attemptedInExam = activeExam ? entries.filter((entry) => entry.submitted).length : 0
@@ -578,7 +585,11 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
               <span>Question target</span>
               <select
                 value={targetQuestions}
-                onChange={(event) => setTargetQuestions(Number(event.target.value))}
+                onChange={(event) => {
+                  const nextValue = Number(event.target.value)
+                  setTargetQuestions(nextValue)
+                  setIsFollowingMaxCoverage(nextValue === recommendedTargetCount)
+                }}
               >
                 {targetCountOptions.map((count) => (
                   <option key={count} value={count}>
