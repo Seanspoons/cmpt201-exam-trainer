@@ -115,6 +115,7 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
   const [activeExam, setActiveExam] = useState<ActiveExam | null>(null)
   const [nowMs, setNowMs] = useState(() => Date.now())
   const [completedAtMs, setCompletedAtMs] = useState<number | null>(null)
+  const [endedManually, setEndedManually] = useState(false)
   const [entries, setEntries] = useState<ExamQuestionEntry[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const seenQuestionIdsRef = useRef<Set<string>>(new Set())
@@ -139,7 +140,8 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     : null
   const isTimeUp = activeExam?.timed ? secondsRemaining === 0 : false
   const isQuestionTargetMet = activeExam ? attemptedInExam >= activeExam.targetQuestions : false
-  const isExamComplete = Boolean(activeExam) && (isTimeUp || isQuestionTargetMet)
+  const isExamComplete =
+    Boolean(activeExam) && (isTimeUp || isQuestionTargetMet || endedManually)
   const isFiveMinuteWarning =
     Boolean(activeExam?.timed) &&
     !isExamComplete &&
@@ -222,6 +224,7 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     setEntries([createExamEntry(firstQuestion)])
     setCurrentIndex(0)
     setCompletedAtMs(null)
+    setEndedManually(false)
   }
 
   const stopExam = () => {
@@ -229,12 +232,17 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     setEntries([])
     setCurrentIndex(0)
     setCompletedAtMs(null)
+    setEndedManually(false)
     seenQuestionIdsRef.current.clear()
     lastQuestionIdRef.current = null
   }
 
   const confirmStopExam = async () => {
     if (!activeExam) return
+    if (isExamComplete) {
+      stopExam()
+      return
+    }
     const confirmed = await requestConfirm({
       title: 'End Current Exam?',
       message: 'Your active exam will end now. Do you want to continue?',
@@ -242,7 +250,8 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
       cancelLabel: 'Keep Exam',
     })
     if (!confirmed) return
-    stopExam()
+    setEndedManually(true)
+    setCompletedAtMs(Date.now())
   }
 
   const updateCurrentEntry = (
@@ -589,7 +598,14 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
           {isExamComplete ? (
             <div className="exam-mode-complete">
               <div className="question-box">
-                <p>Exam complete. {isTimeUp ? 'Time is up.' : 'Question target reached.'}</p>
+                <p>
+                  Exam complete.{' '}
+                  {endedManually
+                    ? 'Ended manually.'
+                    : isTimeUp
+                      ? 'Time is up.'
+                      : 'Question target reached.'}
+                </p>
                 <p>
                   Completed in <strong>{formatSeconds(examDurationSeconds)}</strong>.
                 </p>
