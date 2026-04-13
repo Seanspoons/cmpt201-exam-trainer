@@ -393,6 +393,17 @@
   margin-top: 0.8rem;
 }
 
+.exam-mode-complete {
+  margin-top: 0.8rem;
+  animation: exam-panel-enter 180ms ease-out;
+}
+
+.exam-time-warning {
+  color: #7a560e;
+  font-weight: 600;
+  animation: exam-warning-pulse 1.8s ease-in-out;
+}
+
 .exam-nav-button {
   display: inline-flex;
   align-items: center;
@@ -770,6 +781,29 @@
 
 .answer-feedback-concept svg {
   flex-shrink: 0;
+}
+
+@keyframes exam-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes exam-warning-pulse {
+  0% {
+    opacity: 0.6;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .placeholder-card {

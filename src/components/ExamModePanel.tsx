@@ -115,20 +115,13 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
   const [targetQuestions, setTargetQuestions] = useState(15)
   const [activeExam, setActiveExam] = useState<ActiveExam | null>(null)
   const [nowMs, setNowMs] = useState(() => Date.now())
+  const [completedAtMs, setCompletedAtMs] = useState<number | null>(null)
   const [entries, setEntries] = useState<ExamQuestionEntry[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const seenQuestionIdsRef = useRef<Set<string>>(new Set())
   const lastQuestionIdRef = useRef<string | null>(null)
   const transition = useQuestionTransition()
   const resetPulse = useResetPulse()
-
-  useEffect(() => {
-    if (!activeExam?.timed) return
-    const id = window.setInterval(() => {
-      setNowMs(Date.now())
-    }, 1000)
-    return () => window.clearInterval(id)
-  }, [activeExam?.timed])
 
   const currentEntry = entries[currentIndex] ?? null
   const attemptedInExam = activeExam ? entries.filter((entry) => entry.submitted).length : 0
@@ -148,6 +141,33 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
   const isTimeUp = activeExam?.timed ? secondsRemaining === 0 : false
   const isQuestionTargetMet = activeExam ? attemptedInExam >= activeExam.targetQuestions : false
   const isExamComplete = Boolean(activeExam) && (isTimeUp || isQuestionTargetMet)
+  const isFiveMinuteWarning =
+    Boolean(activeExam?.timed) &&
+    !isExamComplete &&
+    secondsRemaining !== null &&
+    secondsRemaining > 0 &&
+    secondsRemaining <= 300
+  const examDurationSeconds =
+    activeExam && completedAtMs
+      ? Math.max(0, Math.floor((completedAtMs - activeExam.startedAtMs) / 1000))
+      : 0
+
+  useEffect(() => {
+    if (!activeExam?.timed || isExamComplete) return
+    const id = window.setInterval(() => {
+      setNowMs(Date.now())
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [activeExam?.timed, isExamComplete])
+
+  useEffect(() => {
+    if (!activeExam || completedAtMs !== null || !isExamComplete) return
+    if (isTimeUp && activeExam.endsAtMs) {
+      setCompletedAtMs(activeExam.endsAtMs)
+      return
+    }
+    setCompletedAtMs(Date.now())
+  }, [activeExam, completedAtMs, isExamComplete, isTimeUp])
 
   const pickNextQuestion = (unitIds: UnitId[]): NetworkingQuestion | null => {
     let fallback: NetworkingQuestion | null = null
@@ -202,6 +222,7 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     })
     setEntries([createExamEntry(firstQuestion)])
     setCurrentIndex(0)
+    setCompletedAtMs(null)
     setShowConfig(false)
   }
 
@@ -209,6 +230,7 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
     setActiveExam(null)
     setEntries([])
     setCurrentIndex(0)
+    setCompletedAtMs(null)
     seenQuestionIdsRef.current.clear()
     lastQuestionIdRef.current = null
     setShowConfig(true)
@@ -567,12 +589,20 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
             ) : (
               <p>Untimed exam mode is active.</p>
             )}
+            {isFiveMinuteWarning ? (
+              <p className="exam-time-warning" role="status" aria-live="polite">
+                <FiClock aria-hidden="true" /> 5-minute warning: keep moving.
+              </p>
+            ) : null}
           </div>
 
           {isExamComplete ? (
-            <>
+            <div className="exam-mode-complete">
               <div className="question-box">
                 <p>Exam complete. {isTimeUp ? 'Time is up.' : 'Question target reached.'}</p>
+                <p>
+                  Completed in <strong>{formatSeconds(examDurationSeconds)}</strong>.
+                </p>
                 <p>
                   Final result: <strong>{correctInExam}</strong> correct out of{' '}
                   <strong>{attemptedInExam}</strong> attempted ({accuracyInExam}%).
@@ -614,7 +644,7 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                   </table>
                 </div>
               ) : null}
-            </>
+            </div>
           ) : (
             <div className="exam-question-area">
               <h3 className="section-title">Exam Mode &gt; Mixed Units</h3>
