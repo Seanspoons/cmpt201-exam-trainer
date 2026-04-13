@@ -630,6 +630,10 @@ export function ExamModePanel({ onClose }: ExamModePanelProps) {
                 {currentEntry ? (
                   <>
                     <div className="question-box">
+                      <p className="small-note" style={{ marginTop: 0, marginBottom: '0.4rem' }}>
+                        Question <strong>{currentIndex + 1}</strong> of{' '}
+                        <strong>{activeExam.targetQuestions}</strong>
+                      </p>
                       <p>{currentEntry.question.prompt}</p>
                       {currentEntry.question.code ? (
                         <pre className="inline-code-block">{currentEntry.question.code}</pre>
